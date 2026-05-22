@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#00e5b0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="NEUROSYSTEM">
+<link rel="manifest" href="manifest.json">
+<title>NEUROSYSTEM — Radiografia Mental</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0a;
+  --surface: #111111;
+  --surface2: #1a1a1a;
+  --border: rgba(255,255,255,0.08);
+  --border-strong: #00e5b0;
+  --text: #f0f0f0;
+  --text-muted: #b3b3b3;
+  --text-dim: #8e8e93;
+  --cyan: #00e5b0;
+  --cyan-dim: rgba(0,229,176,0.10);
+  --cyan-mid: rgba(0,229,176,0.22);
+  --orange: #ff6b35;
+  --orange-dim: rgba(255,107,53,0.10);
+  --radius: 10px;
+  --radius-sm: 6px;
+  --font-display: 'Syne', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { background: var(--bg); color: var(--text); font-family: var(--font-display); min-height: 100%; }
+body { max-width: 480px; margin: 0 auto; padding-bottom: calc(5rem + var(--safe-bottom)); min-height: 100vh; }
+
+/* ── Header ── */
+.header {
+  padding: 0.9rem 1.25rem 0.85rem;
+  position: sticky; top: 0; background: var(--bg); z-index: 10;
+  border-bottom: 1px solid var(--border);
+}
+.header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand-logo {
+  width: 34px; height: 34px; border-radius: 50%;
+  overflow: hidden; flex-shrink: 0;
+  border: 1.5px solid rgba(0,229,176,0.3);
+}
+.brand-logo img { width: 100%; height: 100%; object-fit: cover; }
+.brand-text { display: flex; flex-direction: column; line-height: 1.2; }
+.brand-channel { font-size: 9px; font-family: var(--font-mono); color: var(--cyan); letter-spacing: 0.1em; text-transform: uppercase; }
+.brand-name { font-size: 15px; font-weight: 700; letter-spacing: 0.08em; color: var(--text); }
+.brand-name span { color: var(--cyan); }
+.date-pill {
+  font-family: var(--font-mono); font-size: 10px; color: var(--text-muted);
+  background: var(--surface2); border: 1px solid var(--border);
+  padding: 3px 9px; border-radius: 20px;
+}
+
+/* ── Nav ── */
+.nav {
+  display: flex; overflow-x: auto; padding: 0 1.25rem;
+  border-bottom: 1px solid var(--border); scrollbar-width: none;
+}
+.nav::-webkit-scrollbar { display: none; }
+.nav-btn {
+  font-family: var(--font-display); font-size: 11px; font-weight: 500;
+  color: var(--text-dim); background: none; border: none;
+  padding: 10px 13px; cursor: pointer; white-space: nowrap;
+  border-bottom: 2px solid transparent; transition: color .2s, border-color .2s;
+  letter-spacing: 0.05em;
+}
+.nav-btn.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+
+.content { padding: 1.25rem; }
+.tab { display: none; }
+.tab.active { display: block; }
+
+/* ── Alert ── */
+.alert {
+  background: var(--orange-dim); border: 1px solid var(--orange);
+  border-radius: var(--radius); padding: 12px 14px;
+  font-size: 12px; color: var(--orange); margin-bottom: 1.25rem;
+  display: flex; align-items: flex-start; gap: 10px; line-height: 1.5;
+}
+
+/* ── Install banner ── */
+.install-banner {
+  background: var(--cyan-dim); border: 1px solid rgba(0,229,176,0.25);
+  border-radius: var(--radius); padding: 11px 14px; margin-bottom: 1.25rem;
+  display: flex; align-items: center; gap: 12px;
+}
+.install-banner-text { flex: 1; font-size: 12px; color: var(--cyan); line-height: 1.5; }
+.install-banner-text strong { display: block; margin-bottom: 1px; font-size: 13px; }
+
+/* ── Section label ── */
+.section-label {
+  font-family: var(--font-mono); font-size: 10px; color: var(--text-dim);
+  letter-spacing: 0.12em; text-transform: uppercase;
+  margin-bottom: 10px; margin-top: 1.4rem;
+}
+.section-label:first-child { margin-top: 0; }
+
+/* ── Card ── */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.card + .card { margin-top: 10px; }
+
+/* ── TAD ── */
+.tad-row { display: flex; align-items: center; gap: 12px; padding: 13px 14px; border-bottom: 1px solid var(--border); }
+.tad-row:last-of-type { border-bottom: none; }
+.tad-check {
+  width: 20px; height: 20px; border: 1.5px solid var(--text-dim);
+  border-radius: 4px; cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .15s, border-color .15s;
+}
+.tad-check.done { background: var(--cyan); border-color: var(--cyan); }
+.tad-check.done::after { content: '✓'; font-size: 12px; color: #000; font-weight: 700; }
+.tad-input { flex: 1; background: none; border: none; outline: none; font-family: var(--font-display); font-size: 13px; color: var(--text); line-height: 1.4; }
+.tad-input::placeholder { color: var(--text-dim); }
+.tad-input.done { text-decoration: line-through; color: var(--text-dim); }
+.tad-num { font-family: var(--font-mono); font-size: 10px; color: var(--text-dim); flex-shrink: 0; }
+
+/* ── Progress ── */
+.progress-area { padding: 12px 14px; border-top: 1px solid var(--border); }
+.progress-track { height: 4px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--cyan); border-radius: 2px; transition: width .4s; }
+.progress-meta { display: flex; justify-content: space-between; margin-top: 6px; }
+.progress-meta span { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); }
+.progress-meta strong { font-family: var(--font-mono); font-size: 11px; color: var(--cyan); }
+
+/* ── Timer ── */
+.timer-display { text-align: center; padding: 1.4rem 1rem 1rem; }
+.timer-num { font-family: var(--font-mono); font-size: 48px; color: var(--text); letter-spacing: 0.04em; font-weight: 500; }
+.timer-num.running { color: var(--cyan); }
+.timer-status { font-size: 11px; color: var(--text-muted); margin-top: 6px; letter-spacing: 0.02em; text-transform: none; text-align: center; line-height: 1.6; padding: 0 12px; }
+.timer-btns { display: flex; gap: 8px; padding: 0 14px 14px; }
+
+/* ── Buttons ── */
+.btn {
+  flex: 1; padding: 10px; border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm); background: none; cursor: pointer;
+  font-family: var(--font-display); font-size: 12px; font-weight: 500;
+  color: var(--text); transition: background .15s; letter-spacing: 0.04em;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.btn:hover { background: var(--surface2); }
+.btn:active { opacity: 0.75; }
+.btn.primary { background: var(--cyan-dim); border-color: var(--cyan); color: var(--cyan); }
+.btn.primary:hover { background: var(--cyan-mid); }
+.btn.full { flex: none; width: 100%; }
+.btn.orange { border-color: var(--orange); color: var(--orange); background: var(--orange-dim); }
+.btn.sm { padding: 7px 12px; font-size: 11px; flex: none; width: auto; }
+
+/* ── Protocol ── */
+.proto-item { display: flex; gap: 12px; padding: 13px 14px; border-bottom: 1px solid var(--border); }
+.proto-item:last-child { border-bottom: none; }
+.proto-icon { font-size: 18px; flex-shrink: 0; width: 28px; text-align: center; }
+.proto-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+.proto-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+.proto-ref { font-size: 10px; color: var(--text-dim); margin-top: 3px; font-family: var(--font-mono); }
+
+/* ── No screen ── */
+.no-screen { background: var(--orange-dim); border: 1px solid rgba(255,107,53,0.3); border-radius: var(--radius); padding: 12px 14px; margin-top: 10px; }
+.no-screen-title { font-size: 12px; font-weight: 500; color: var(--orange); margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+.no-screen-desc { font-size: 11px; color: rgba(255,107,53,0.65); line-height: 1.5; }
+
+/* ── Select ── */
+.select-row { display: flex; align-items: center; justify-content: space-between; padding: 13px 14px; }
+.select-label { font-size: 13px; color: var(--text-muted); }
+select { background: var(--surface2); border: 1px solid var(--border-strong); border-radius: var(--radius-sm); color: var(--text); font-family: var(--font-display); font-size: 12px; padding: 5px 10px; cursor: pointer; }
+
+/* ── Cierre ── */
+.cierre-step { display: flex; gap: 12px; padding: 14px; border-bottom: 1px solid var(--border); }
+.cierre-step:last-child { border-bottom: none; }
+.step-circle { width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--border-strong); display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); flex-shrink: 0; transition: all .2s; }
+.step-circle.done { background: var(--cyan); border-color: var(--cyan); color: #000; font-weight: 700; }
+.step-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+.step-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; line-height: 1.5; }
+.cierre-input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 10px; font-family: var(--font-display); font-size: 12px; color: var(--text); outline: none; margin-bottom: 6px; transition: border-color .15s; }
+.cierre-input:focus { border-color: var(--cyan); }
+.cierre-input::placeholder { color: var(--text-dim); }
+.check-label { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); margin-bottom: 8px; cursor: pointer; }
+.check-label input { accent-color: var(--cyan); width: 14px; height: 14px; cursor: pointer; }
+
+/* ── Day closed ── */
+.day-closed { background: var(--cyan-dim); border: 1px solid rgba(0,229,176,0.3); border-radius: var(--radius); padding: 1.5rem; text-align: center; margin-top: 10px; }
+.day-closed-icon { font-size: 28px; margin-bottom: 8px; }
+.day-closed-title { font-size: 15px; font-weight: 500; color: var(--cyan); margin-bottom: 4px; }
+.day-closed-sub { font-size: 12px; color: rgba(0,229,176,0.5); }
+
+/* ── Week chart ── */
+.stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; text-align: center; }
+.stat-val { font-family: var(--font-mono); font-size: 22px; color: var(--cyan); font-weight: 500; }
+.stat-lbl { font-size: 10px; color: var(--text-dim); margin-top: 3px; letter-spacing: 0.04em; }
+.bars-wrap { padding: 14px; }
+.bars { display: flex; gap: 6px; align-items: flex-end; height: 80px; margin-bottom: 8px; }
+.bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; }
+.bar-bg { width: 100%; flex: 1; background: var(--surface2); border-radius: 3px; position: relative; overflow: hidden; min-height: 4px; }
+.bar-fg { position: absolute; bottom: 0; width: 100%; background: var(--cyan); border-radius: 3px; transition: height .5s; opacity: 0.8; }
+.bar-fg.zero { background: var(--border-strong); height: 4px !important; }
+.bar-day { font-family: var(--font-mono); font-size: 9px; color: var(--text-dim); }
+.bar-today .bar-day { color: var(--cyan); }
+
+/* ── Diagnóstico ── */
+.diag-q { margin-bottom: 14px; }
+.diag-label { font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 6px; display: block; }
+textarea { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 10px; resize: none; font-family: var(--font-display); font-size: 12px; color: var(--text); outline: none; line-height: 1.5; transition: border-color .15s; }
+textarea:focus { border-color: var(--cyan); }
+textarea::placeholder { color: var(--text-dim); }
+
+/* ── Backup ── */
+.backup-row { display: flex; align-items: center; gap: 12px; padding: 14px; border-bottom: 1px solid var(--border); }
+.backup-row:last-child { border-bottom: none; }
+.backup-info { flex: 1; }
+.backup-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
+.backup-desc { font-size: 11px; color: var(--text-muted); line-height: 1.4; }
+.backup-msg { margin-top: 10px; padding: 10px 14px; border-radius: var(--radius-sm); font-size: 12px; display: none; }
+.backup-msg.ok { background: var(--cyan-dim); color: var(--cyan); border: 1px solid rgba(0,229,176,0.3); }
+.backup-msg.err { background: var(--orange-dim); color: var(--orange); border: 1px solid rgba(255,107,53,0.3); }
+
+/* ── About card ── */
+.about-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-top: 10px; }
+.about-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+.about-logo { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; border: 1.5px solid rgba(0,229,176,0.3); flex-shrink: 0; }
+.about-logo img { width: 100%; height: 100%; object-fit: cover; }
+.about-channel { font-size: 10px; font-family: var(--font-mono); color: var(--cyan); letter-spacing: 0.1em; }
+.about-title { font-size: 14px; font-weight: 500; color: var(--text); }
+.about-text { font-size: 12px; color: var(--text-muted); line-height: 1.7; }
+.about-text a { color: var(--cyan); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div class="brand">
+      <div class="brand-logo">
+        <img src="data:image/png;base64,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" alt="Radiografia Mental" />
+      </div>
+      <div class="brand-text">
+        <span class="brand-channel">Radiografia Mental</span>
+        <span class="brand-name">NEURO<span>SYSTEM</span></span>
+      </div>
+    </div>
+    <div class="date-pill" id="date-label"></div>
+  </div>
+</div>
+
+<nav class="nav">
+  <button class="nav-btn active" onclick="showTab('foco',this)">FOCO</button>
+  <button class="nav-btn" onclick="showTab('valle',this)">VALLE</button>
+  <button class="nav-btn" onclick="showTab('cierre',this)">CIERRE PM</button>
+  <button class="nav-btn" onclick="showTab('semana',this)">SEMANA</button>
+  <button class="nav-btn" onclick="showTab('datos',this)">DATOS</button>
+</nav>
+
+<div class="content">
+
+<!-- TAB FOCO -->
+<div id="tab-foco" class="tab active">
+  <div id="alert-box" class="alert" style="display:none">
+    <div style="font-size:16px;flex-shrink:0">⚠</div>
+    <div><strong>Un día no destruye el circuito.</strong> El compromiso es hoy. — Regla de los Dos Días · Cap. 3</div>
+  </div>
+  <div id="focus-lock-banner" class="alert" style="display:none;background:rgba(0,229,176,0.08);border-color:var(--cyan)">
+    <div style="font-size:16px;flex-shrink:0">🔒</div>
+    <div style="color:var(--cyan)"><strong>Bloque de foco activo.</strong> Las TADs y la navegación están bloqueadas. Pausa el temporizador para editarlas.</div>
+  </div>
+  <div id="install-banner" class="install-banner" style="display:none">
+    <div style="font-size:20px">📲</div>
+    <div class="install-banner-text">
+      <strong>Instala como app</strong>
+      Agrega a la pantalla de inicio para proteger tus datos.
+    </div>
+    <button class="btn sm primary" onclick="installPWA()">Instalar</button>
+  </div>
+
+  <div class="section-label">Tareas de Alto Desempeño — Cap. 2</div>
+  <div class="card">
+    <div class="tad-row">
+      <span class="tad-num">01</span>
+      <div class="tad-check" id="c0" onclick="toggleTad(0)"></div>
+      <input class="tad-input" id="t0" placeholder="Tarea crítica que no puede quedar sin hacer hoy" />
+    </div>
+    <div class="tad-row">
+      <span class="tad-num">02</span>
+      <div class="tad-check" id="c1" onclick="toggleTad(1)"></div>
+      <input class="tad-input" id="t1" placeholder="Segunda tarea de alta prioridad" />
+    </div>
+    <div class="tad-row">
+      <span class="tad-num">03</span>
+      <div class="tad-check" id="c2" onclick="toggleTad(2)"></div>
+      <input class="tad-input" id="t2" placeholder="Tercera tarea de alta prioridad" />
+    </div>
+    <div class="progress-area">
+      <div class="progress-track"><div class="progress-fill" id="prog" style="width:0%"></div></div>
+      <div class="progress-meta"><span>tasa de ejecución</span><strong id="pct-val">0%</strong></div>
+    </div>
+  </div>
+
+  <div class="section-label">Bloque de Foco — 90 min · Cap. 2</div>
+  <div class="card">
+    <div class="timer-display">
+      <div class="timer-num" id="timer-num">90:00</div>
+      <div class="timer-status" id="timer-status">Tu mente no necesita más motivación. Necesita menos fricción.</div>
+    </div>
+    <div class="timer-btns">
+      <button class="btn primary" id="btn-start" onclick="timerAction('start')">▶ Iniciar</button>
+      <button class="btn" id="btn-pause" onclick="timerAction('pause')" style="display:none">⏸ Pausar</button>
+      <button class="btn" onclick="timerAction('reset')">↺ Reset</button>
+    </div>
+  </div>
+</div>
+
+<!-- TAB VALLE -->
+<div id="tab-valle" class="tab">
+  <div class="section-label">Protocolo de Recuperación Válido — Cap. 2</div>
+  <div class="card">
+    <div class="proto-item">
+      <div class="proto-icon">🚶</div>
+      <div>
+        <div class="proto-title">Movimiento</div>
+        <div class="proto-desc">Camina 5 minutos. Estiramiento suave. Evita estar sentado durante el valle.</div>
+        <div class="proto-ref">NEUROSYSTEM · Radiografia Mental</div>
+      </div>
+    </div>
+    <div class="proto-item">
+      <div class="proto-icon">💧</div>
+      <div>
+        <div class="proto-title">Hidratación</div>
+        <div class="proto-desc">Bebe un vaso de agua. Sin cafeína en valles después de las 14 h.</div>
+        <div class="proto-ref">NEUROSYSTEM · Radiografia Mental</div>
+      </div>
+    </div>
+    <div class="proto-item">
+      <div class="proto-icon">🌬</div>
+      <div>
+        <div class="proto-title">Box Breathing</div>
+        <div class="proto-desc">Inhala 4 s → Retén 4 s → Exhala 4 s → Retén 4 s. Repite 4 veces.</div>
+        <div class="proto-ref">NEUROSYSTEM · Radiografia Mental</div>
+      </div>
+    </div>
+    <div class="proto-item">
+      <div class="proto-icon">🏔</div>
+      <div>
+        <div class="proto-title">Vista al horizonte</div>
+        <div class="proto-desc">Mira un punto lejano por 2 minutos. Activa el descanso visual profundo.</div>
+        <div class="proto-ref">NEUROSYSTEM · Radiografia Mental</div>
+      </div>
+    </div>
+  </div>
+  <div class="no-screen">
+    <div class="no-screen-title">📵 Prohibido el uso de pantallas</div>
+    <div class="no-screen-desc">Cap. 2 del libro — Las redes sociales activan el mismo circuito de recompensa que el trabajo. Un valle falso no recupera el sistema nervioso.</div>
+  </div>
+
+  <div class="section-label" style="margin-top:1.25rem">Registro del Valle</div>
+  <div class="card">
+    <div class="select-row">
+      <span class="select-label">¿Fue un valle real o falso?</span>
+      <select id="valle-sel" onchange="saveValle()">
+        <option value="">— Seleccionar —</option>
+        <option value="real">Valle real 🌳</option>
+        <option value="falso">Valle falso 📱</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="section-label">Temporizador de Valle — 15 min</div>
+  <div class="card">
+    <div class="timer-display">
+      <div class="timer-num" id="v-timer-num">15:00</div>
+      <div class="timer-status" id="v-timer-status">listo para iniciar</div>
+    </div>
+    <div class="timer-btns">
+      <button class="btn primary" id="vbtn-start" onclick="vTimerAction('start')">▶ Iniciar</button>
+      <button class="btn" id="vbtn-pause" onclick="vTimerAction('pause')" style="display:none">⏸ Pausar</button>
+      <button class="btn" onclick="vTimerAction('reset')">↺ Reset</button>
+    </div>
+  </div>
+</div>
+
+<!-- TAB CIERRE PM -->
+<div id="tab-cierre" class="tab">
+  <div class="section-label">Rutina de Cierre PM — Cap. 3</div>
+  <div class="card">
+    <div class="cierre-step">
+      <div class="step-circle" id="s1">1</div>
+      <div style="flex:1">
+        <div class="step-title">Revisión de TADs completadas</div>
+        <div class="step-desc">Marca las tareas hechas. Libera el Efecto Zeigarnik y cierra los loops abiertos del día.</div>
+        <button class="btn sm" onclick="doneStep(1)">✓ Listo</button>
+      </div>
+    </div>
+    <div class="cierre-step">
+      <div class="step-circle" id="s2">2</div>
+      <div style="flex:1">
+        <div class="step-title">TADs de mañana</div>
+        <div class="step-desc">Define las 3 tareas del día siguiente antes de dormir. Cap. 2 — protocolo de planificación nocturna.</div>
+        <input class="cierre-input" id="m0" placeholder="TAD 1 de mañana" />
+        <input class="cierre-input" id="m1" placeholder="TAD 2 de mañana" />
+        <input class="cierre-input" id="m2" placeholder="TAD 3 de mañana" />
+        <button class="btn sm" style="margin-top:4px" onclick="doneStep(2)">✓ Guardar</button>
+      </div>
+    </div>
+    <div class="cierre-step">
+      <div class="step-circle" id="s3">3</div>
+      <div style="flex:1">
+        <div class="step-title">Checklist de preparación</div>
+        <div class="step-desc">Confirma los preparativos. Cap. 3 — reducción de fricción matutina.</div>
+        <label class="check-label"><input type="checkbox" /> Ropa seleccionada para mañana</label>
+        <label class="check-label"><input type="checkbox" /> Espacio de trabajo ordenado</label>
+        <label class="check-label"><input type="checkbox" /> Teléfono en modo no molestar</label>
+        <label class="check-label"><input type="checkbox" /> Hora de dormir definida</label>
+        <button class="btn primary full" style="margin-top:10px" onclick="closeDia()">🌙 Cerrar el día</button>
+      </div>
+    </div>
+  </div>
+  <div id="day-done" style="display:none" class="day-closed">
+    <div class="day-closed-icon">✦</div>
+    <div class="day-closed-title">Día cerrado correctamente</div>
+    <div class="day-closed-sub">Protocolo NEUROSYSTEM · Radiografia Mental</div>
+  </div>
+</div>
+
+<!-- TAB SEMANA -->
+<div id="tab-semana" class="tab">
+  <div class="section-label">Meta-análisis semanal — Cap. 4</div>
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-val" id="s-avg">—</div><div class="stat-lbl">promedio TAD</div></div>
+    <div class="stat-card"><div class="stat-val" id="s-streak">—</div><div class="stat-lbl">días activos</div></div>
+    <div class="stat-card"><div class="stat-val" id="s-valles">—</div><div class="stat-lbl">valles reales</div></div>
+  </div>
+  <div class="card">
+    <div class="bars-wrap">
+      <div class="bars" id="week-bars"></div>
+      <div style="display:flex;gap:6px" id="week-days"></div>
+    </div>
+  </div>
+
+  <div class="section-label" style="margin-top:1.25rem">Diagnóstico semanal — 4 dimensiones · Cap. 4</div>
+  <div class="card" style="padding:14px">
+    <div class="diag-q">
+      <label class="diag-label">1 · Consistencia — ¿Cuántos días completé las 3 TADs?</label>
+      <textarea rows="2" placeholder="Anota el patrón que observas esta semana..."></textarea>
+    </div>
+    <div class="diag-q">
+      <label class="diag-label">2 · Patrón de días malos — ¿Qué contextos generan fallas?</label>
+      <textarea rows="2" placeholder="¿Qué días o situaciones detonaron la falla?"></textarea>
+    </div>
+    <div class="diag-q">
+      <label class="diag-label">3 · Calibración — ¿Las TADs fueron bien dimensionadas?</label>
+      <textarea rows="2" placeholder="¿Demasiado grandes, demasiado pequeñas?"></textarea>
+    </div>
+    <div class="diag-q" style="margin-bottom:0">
+      <label class="diag-label">4 · Valle real vs. falso — ¿Qué contaminó los valles?</label>
+      <textarea rows="2" placeholder="¿Cuántos valles fueron reales esta semana?"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- TAB DATOS -->
+<div id="tab-datos" class="tab">
+  <div class="section-label">Copia de seguridad</div>
+  <div class="card">
+    <div class="backup-row">
+      <div class="backup-info">
+        <div class="backup-title">Exportar datos</div>
+        <div class="backup-desc">Descarga tu historial completo. Guárdalo en Google Drive o iCloud.</div>
+      </div>
+      <button class="btn sm primary" onclick="exportData()">↓ Exportar</button>
+    </div>
+    <div class="backup-row">
+      <div class="backup-info">
+        <div class="backup-title">Importar datos</div>
+        <div class="backup-desc">Restaura tu historial desde un archivo de respaldo anterior.</div>
+      </div>
+      <button class="btn sm" onclick="document.getElementById('import-file').click()">↑ Importar</button>
+      <input type="file" id="import-file" accept=".nsbackup" style="display:none" onchange="importData(event)" />
+    </div>
+  </div>
+  <div id="backup-msg" class="backup-msg"></div>
+
+  <div class="section-label" style="margin-top:1.4rem">Instalar como app</div>
+  <div class="card" style="padding:14px">
+    <div style="font-size:13px;color:var(--text-muted);line-height:1.7;margin-bottom:12px">
+      Instala NEUROSYSTEM en la pantalla de inicio para usarlo sin internet y proteger tus datos del borrado automático del navegador.
+    </div>
+    <div style="font-size:12px;color:var(--text-dim);line-height:1.7">
+      <strong style="color:var(--text-muted);display:block;margin-bottom:3px">En iPhone (Safari):</strong>
+      Toca el ícono de compartir → "Agregar a pantalla de inicio" → Agregar
+    </div>
+    <div style="font-size:12px;color:var(--text-dim);line-height:1.7;margin-top:10px">
+      <strong style="color:var(--text-muted);display:block;margin-bottom:3px">En Android (Chrome):</strong>
+      Toca el menú (⋮) → "Agregar a pantalla de inicio" → Instalar
+    </div>
+    <button class="btn primary full" id="install-btn2" onclick="installPWA()" style="margin-top:12px;display:none">📲 Instalar ahora</button>
+  </div>
+
+  <div class="section-label" style="margin-top:1.4rem">Acerca de</div>
+  <div class="about-card">
+    <div class="about-brand">
+      <div class="about-logo">
+        <img src="data:image/png;base64,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" alt="Radiografia Mental" />
+      </div>
+      <div>
+        <div class="about-channel">Radiografia Mental</div>
+        <div class="about-title">NEUROSYSTEM v1.0</div>
+      </div>
+    </div>
+    <div class="about-text">
+      Aplicativo oficial del libro <strong>NEUROSYSTEM</strong>, desarrollado exclusivamente para lectores del canal Radiografia Mental.<br><br>
+      Este sistema de ingeniería conductual fue diseñado para implementar los protocolos de los 4 capítulos del libro directamente en tu rutina diaria — sin fricción, sin apps de terceros.<br><br>
+      Tus datos se almacenan únicamente en tu dispositivo.
+    </div>
+  </div>
+
+  <div style="margin-top:10px;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)">
+    <div style="font-size:12px;color:var(--text-dim);line-height:1.8">
+      <div>Versión: <span style="color:var(--text-muted)">1.0.0</span></div>
+      <div>Datos almacenados: <span style="color:var(--cyan)" id="data-size">—</span></div>
+      <div>Historial registrado: <span style="color:var(--text-muted)" id="data-days">— días</span></div>
+    </div>
+    <button class="btn orange full sm" style="margin-top:12px;width:100%" onclick="confirmReset()">⚠ Borrar todos los datos</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
+}
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault(); deferredPrompt = e;
+  document.getElementById('install-banner').style.display = 'flex';
+  document.getElementById('install-btn2').style.display = 'flex';
+});
+function installPWA() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(() => {
+      deferredPrompt = null;
+      document.getElementById('install-banner').style.display = 'none';
+    });
+  }
+}
+
+const DAYS = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+const today = new Date();
+const todayStr = today.toDateString();
+const STORAGE_KEY = 'ns_v2';
+
+let state = { tads:[false,false,false], tadText:['','',''], weekData:[], valleType:'', cierreSteps:[false,false,false], mañanaTads:['','',''] };
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const saved = JSON.parse(raw);
+    if (saved.date === todayStr) { state = Object.assign(state, saved); }
+    else {
+      // New day: carry forward only weekData and tomorrow's TADs
+      state.weekData = saved.weekData || [];
+      if (saved.mañanaTads && saved.mañanaTads.some(t=>t)) state.tadText = saved.mañanaTads;
+      // BUG FIX 1: always reset daily state on new day
+      state.tads = [false, false, false];
+      state.cierreSteps = [false, false, false];
+      state.valleType = '';
+      state.mañanaTads = ['', '', ''];
+    }
+  } catch(e) {}
+}
+function save() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(Object.assign({}, state, {date: todayStr}))); updateDataInfo(); } catch(e) {}
+}
+loadState();
+
+document.getElementById('date-label').textContent = today.toLocaleDateString('es-ES', {weekday:'long',day:'numeric',month:'short'});
+
+function showTab(id, btn) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+  if (id==='semana') renderWeek();
+  if (id==='datos') updateDataInfo();
+}
+
+function renderTads() {
+  state.tads.forEach((v,i) => {
+    const c = document.getElementById('c'+i), inp = document.getElementById('t'+i);
+    c.className = 'tad-check'+(v?' done':'');
+    inp.className = 'tad-input'+(v?' done':'');
+    if (inp.value==='' && state.tadText[i]) inp.value = state.tadText[i];
+  });
+  const done = state.tads.filter(Boolean).length;
+  const pct = Math.round(done/3*100);
+  document.getElementById('prog').style.width = pct+'%';
+  document.getElementById('pct-val').textContent = pct+'%';
+  updateMotivationalStatus(pct);
+  checkAlert();
+}
+
+function updateMotivationalStatus(pct) {
+  // Only update status message when timer is NOT running
+  if (timerRunning) return;
+  const statusEl = document.getElementById('timer-status');
+  if (!statusEl) return;
+  if (pct === 100) {
+    statusEl.textContent = 'Sistema calibrado. Córtex en máxima eficiencia. ✦';
+    statusEl.style.color = 'var(--cyan)';
+  } else if (pct >= 66) {
+    statusEl.textContent = 'Buen ritmo. Una TAD más y el día está ganado.';
+    statusEl.style.color = 'var(--text-muted)';
+  } else if (pct > 0) {
+    statusEl.textContent = 'El foco profundo cambia todo. Activa el temporizador.';
+    statusEl.style.color = 'var(--text-dim)';
+  } else {
+    statusEl.textContent = 'Tu mente no necesita más motivación. Necesita menos fricción.';
+    statusEl.style.color = 'var(--text-dim)';
+  }
+}
+document.querySelectorAll('.tad-input').forEach((inp,i) => {
+  inp.addEventListener('input', () => { state.tadText[i]=inp.value; save(); });
+});
+function toggleTad(i) { state.tads[i]=!state.tads[i]; renderTads(); save(); }
+function checkAlert() {
+  const yesterday = new Date(today); yesterday.setDate(today.getDate()-1);
+  const yEntry = state.weekData.find(d=>d.date===yesterday.toDateString());
+  document.getElementById('alert-box').style.display = (yEntry && yEntry.pct===0) ? 'flex' : 'none';
+}
+renderTads();
+
+let timerSecs=90*60, timerRunning=false, timerInterval=null;
+
+function lockFocusMode(lock) {
+  try {
+    document.querySelectorAll('.tad-input').forEach(function(inp) {
+      inp.readOnly = lock;
+      inp.style.opacity = lock ? '0.75' : '1';
+      inp.style.cursor = lock ? 'not-allowed' : '';
+    });
+    document.querySelectorAll('.tad-check').forEach(function(el) {
+      el.style.pointerEvents = lock ? 'none' : '';
+      el.style.opacity = lock ? '0.75' : '1';
+    });
+    var navBtns = document.querySelectorAll('.nav-btn');
+    navBtns.forEach(function(btn, idx) {
+      if (idx > 0) {
+        btn.style.pointerEvents = lock ? 'none' : '';
+        btn.style.opacity = lock ? '0.35' : '1';
+      }
+    });
+    var banner = document.getElementById('focus-lock-banner');
+    if (banner) banner.style.display = lock ? 'flex' : 'none';
+  } catch(e) {}
+}
+
+function timerTick() {
+  if (timerSecs <= 0) {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    lockFocusMode(false);
+    var st = document.getElementById('timer-status');
+    st.textContent = 'Bloque completado. Activa el Valle ahora. ✦';
+    st.style.color = 'var(--cyan)';
+    document.getElementById('btn-start').style.display = 'flex';
+    document.getElementById('btn-pause').style.display = 'none';
+    document.getElementById('timer-num').classList.remove('running');
+    return;
+  }
+  timerSecs--;
+  var m = Math.floor(timerSecs/60), s = timerSecs%60;
+  document.getElementById('timer-num').textContent = (m<10?'0'+m:m)+':'+(s<10?'0'+s:s);
+  document.getElementById('timer-status').textContent = 'en curso...';
+  document.getElementById('timer-status').style.color = 'var(--text-dim)';
+}
+
+function timerAction(a) {
+  if (a === 'start') {
+    if (timerRunning) return;
+    timerRunning = true;
+    lockFocusMode(true);
+    document.getElementById('btn-start').style.display = 'none';
+    document.getElementById('btn-pause').style.display = 'flex';
+    document.getElementById('timer-num').classList.add('running');
+    timerInterval = setInterval(timerTick, 1000);
+  } else if (a === 'pause') {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    lockFocusMode(false);
+    document.getElementById('btn-start').style.display = 'flex';
+    document.getElementById('btn-pause').style.display = 'none';
+    document.getElementById('timer-status').textContent = 'En pausa. El foco vuelve cuando tú decides.';
+    document.getElementById('timer-status').style.color = 'var(--text-dim)';
+    document.getElementById('timer-num').classList.remove('running');
+  } else {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    timerSecs = 90*60;
+    lockFocusMode(false);
+    document.getElementById('timer-num').textContent = '90:00';
+    document.getElementById('btn-start').style.display = 'flex';
+    document.getElementById('btn-pause').style.display = 'none';
+    document.getElementById('timer-num').classList.remove('running');
+    var done2 = state.tads.filter(Boolean).length;
+    updateMotivationalStatus(Math.round(done2/3*100));
+  }
+}
+
+let vSecs=15*60, vRunning=false, vInterval=null;
+
+function vTimerTick() {
+  if (vSecs <= 0) {
+    clearInterval(vInterval);
+    vRunning = false;
+    document.getElementById('v-timer-status').textContent = 'valle completado 🌳';
+    document.getElementById('vbtn-start').style.display = 'flex';
+    document.getElementById('vbtn-pause').style.display = 'none';
+    document.getElementById('v-timer-num').classList.remove('running');
+    return;
+  }
+  vSecs--;
+  var m = Math.floor(vSecs/60), s = vSecs%60;
+  document.getElementById('v-timer-num').textContent = (m<10?'0'+m:m)+':'+(s<10?'0'+s:s);
+  document.getElementById('v-timer-status').textContent = 'recuperando...';
+}
+
+function vTimerAction(a) {
+  if (a === 'start') {
+    if (vRunning) return;
+    vRunning = true;
+    document.getElementById('vbtn-start').style.display = 'none';
+    document.getElementById('vbtn-pause').style.display = 'flex';
+    document.getElementById('v-timer-num').classList.add('running');
+    vInterval = setInterval(vTimerTick, 1000);
+  } else if (a === 'pause') {
+    clearInterval(vInterval);
+    vRunning = false;
+    document.getElementById('vbtn-start').style.display = 'flex';
+    document.getElementById('vbtn-pause').style.display = 'none';
+    document.getElementById('v-timer-status').textContent = 'pausado';
+    document.getElementById('v-timer-num').classList.remove('running');
+  } else {
+    clearInterval(vInterval);
+    vRunning = false;
+    vSecs = 15*60;
+    document.getElementById('v-timer-num').textContent = '15:00';
+    document.getElementById('v-timer-status').textContent = 'listo para iniciar';
+    document.getElementById('vbtn-start').style.display = 'flex';
+    document.getElementById('vbtn-pause').style.display = 'none';
+    document.getElementById('v-timer-num').classList.remove('running');
+  }
+}
+
+function saveValle() { state.valleType=document.getElementById('valle-sel').value; save(); }
+if(state.valleType) document.getElementById('valle-sel').value=state.valleType;
+
+function doneStep(n) { state.cierreSteps[n-1]=true; const el=document.getElementById('s'+n); el.classList.add('done'); el.textContent='✓'; save(); }
+state.cierreSteps.forEach((v,i)=>{ if(v){const el=document.getElementById('s'+(i+1));el.classList.add('done');el.textContent='✓';}});
+if(state.mañanaTads) state.mañanaTads.forEach((t,i)=>{ const el=document.getElementById('m'+i); if(el&&t) el.value=t; });
+
+function closeDia() {
+  const done=state.tads.filter(Boolean).length, pct=Math.round(done/3*100);
+  const entry={date:todayStr,day:today.getDay(),pct,valleReal:state.valleType==='real'};
+  const wd=state.weekData||[];
+  const idx=wd.findIndex(d=>d.date===todayStr);
+  if(idx>-1)wd[idx]=entry;else wd.push(entry);
+  if(wd.length>90)wd.shift();
+  state.weekData=wd;
+  state.mañanaTads=[document.getElementById('m0').value,document.getElementById('m1').value,document.getElementById('m2').value];
+  state.cierreSteps[2]=true;
+  document.getElementById('s3').classList.add('done');document.getElementById('s3').textContent='✓';
+  document.getElementById('day-done').style.display='block';
+  save();
+}
+
+function renderWeek() {
+  const wd=state.weekData||[];
+  const barsEl=document.getElementById('week-bars'),daysEl=document.getElementById('week-days');
+  barsEl.innerHTML='';daysEl.innerHTML='';
+
+  // BUG FIX 2: build the 7 slots from actual recorded entries, not calendar days.
+  // This prevents gaps when the user misses days or reopens after a long absence.
+  // Strategy: take up to the last 6 recorded entries + today's slot, sorted chronologically.
+  const recordedDates = wd.map(e=>e.date);
+  // Build a set of the last 7 calendar days that either have data OR are today
+  const slots = [];
+  for(let i=6;i>=0;i--){
+    const d=new Date(today);
+    d.setDate(today.getDate()-i);
+    slots.push(d);
+  }
+  // Also ensure any recorded entry in the last 90 days appears if it fills a slot
+  slots.forEach(d=>{
+    const entry=wd.find(e=>e.date===d.toDateString());
+    const pct=entry?entry.pct:null;
+    const isToday=d.toDateString()===todayStr;
+    // Distinguish: no record at all vs record of 0%
+    const hasRecord = entry !== undefined;
+    const col=document.createElement('div');col.className='bar-col'+(isToday?' bar-today':'');
+    const fillH = (pct!==null && pct>0) ? pct : 0;
+    const fillClass = (!hasRecord) ? 'bar-fg zero' : (pct===0 ? 'bar-fg zero' : 'bar-fg');
+    // Show a faint stripe for days with no data vs days with 0%
+    const opacity = !hasRecord ? '0.40' : '1';
+    col.innerHTML='<div class="bar-bg"><div class="'+fillClass+'" style="height:'+fillH+'%;opacity:'+opacity+'"></div></div>';
+    barsEl.appendChild(col);
+    const dayEl=document.createElement('div');dayEl.className='bar-day';dayEl.style.flex='1';dayEl.style.textAlign='center';
+    if(isToday)dayEl.style.color='var(--cyan)';
+    // Show day initial; mark days with no data as dimmer
+    if(!hasRecord)dayEl.style.opacity='0.60';
+    dayEl.textContent=DAYS[d.getDay()];daysEl.appendChild(dayEl);
+  });
+
+  const withData=wd.filter(d=>typeof d.pct==='number');
+  const avg=withData.length?Math.round(withData.reduce((a,b)=>a+b.pct,0)/withData.length):null;
+  document.getElementById('s-avg').textContent=avg!==null?avg+'%':'—';
+  document.getElementById('s-streak').textContent=withData.length?wd.filter(d=>d.pct>0).length:'—';
+  document.getElementById('s-valles').textContent=withData.length?wd.filter(d=>d.valleReal).length:'—';
+}
+
+function showMsg(text,type){const el=document.getElementById('backup-msg');el.textContent=text;el.className='backup-msg '+type;el.style.display='block';setTimeout(()=>{el.style.display='none';},4000);}
+
+function exportData() {
+  try {
+    const payload={version:'1.0',exportDate:new Date().toISOString(),product:'NEUROSYSTEM — Radiografia Mental',data:JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}')};
+    const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/octet-stream'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;a.download='neurosystem-backup-'+new Date().toISOString().split('T')[0]+'.nsbackup';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+    showMsg('✓ Backup exportado. Guárdalo en Google Drive o iCloud.','ok');
+  } catch(e){showMsg('Error al exportar. Intenta de nuevo.','err');}
+}
+
+function importData(event) {
+  const file=event.target.files[0]; if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try {
+      const payload=JSON.parse(e.target.result);
+      if(!payload.data)throw new Error();
+      localStorage.setItem(STORAGE_KEY,JSON.stringify(payload.data));
+      loadState();renderTads();
+      showMsg('✓ Datos restaurados. Navega entre las pestañas para ver los cambios.','ok');
+    } catch(err){showMsg('Archivo inválido. Solo se aceptan archivos .nsbackup de NEUROSYSTEM.','err');}
+  };
+  reader.readAsText(file);event.target.value='';
+}
+
+function updateDataInfo() {
+  try {
+    const raw=localStorage.getItem(STORAGE_KEY)||'';
+    document.getElementById('data-size').textContent=(new Blob([raw]).size/1024).toFixed(1)+' KB';
+    document.getElementById('data-days').textContent=(state.weekData?state.weekData.length:0)+' días registrados';
+  } catch(e){}
+}
+
+function confirmReset() {
+  if(confirm('¿Seguro que quieres borrar TODOS los datos de NEUROSYSTEM? Esta acción no se puede deshacer.')) { localStorage.removeItem(STORAGE_KEY); location.reload(); }
+}
+</script>
+</body>
+</html>
