@@ -1,0 +1,1575 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#00e5b0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="NEUROSYSTEM">
+<title>NEUROSYSTEM — Radiografía Mental</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0a;
+  --surface: #111111;
+  --surface2: #1a1a1a;
+  --border: rgba(255,255,255,0.08);
+  --border-strong: #00e5b0;
+  --text: #f0f0f0;
+  --text-muted: #b3b3b3;
+  --text-dim: #8e8e93;
+  --cyan: #00e5b0;
+  --cyan-dim: rgba(0,229,176,0.10);
+  --cyan-mid: rgba(0,229,176,0.22);
+  --orange: #ff6b35;
+  --orange-dim: rgba(255,107,53,0.10);
+  --radius: 10px;
+  --radius-sm: 6px;
+  --font-display: 'Syne', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { background: var(--bg); color: var(--text); font-family: var(--font-display); min-height: 100%; }
+body { max-width: 480px; margin: 0 auto; padding-bottom: calc(5rem + var(--safe-bottom)); min-height: 100vh; }
+
+/* ── ONBOARDING OVERLAY ── */
+#onboarding {
+  position: fixed; inset: 0; background: var(--bg); z-index: 1000;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 2rem 1.5rem; max-width: 480px; margin: 0 auto;
+  animation: fadeIn .4s ease;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+.ob-step { width: 100%; animation: slideIn .3s ease; }
+.ob-logo { text-align: center; margin-bottom: 2rem; }
+.ob-logo-img { width: 56px; height: 56px; border-radius: 50%; border: 2px solid rgba(0,229,176,0.4); overflow: hidden; margin: 0 auto 10px; }
+.ob-logo-img img { width: 100%; height: 100%; object-fit: cover; }
+.ob-channel { font-family: var(--font-mono); font-size: 10px; color: var(--cyan); letter-spacing: 0.12em; text-transform: uppercase; }
+.ob-brand { font-size: 22px; font-weight: 700; letter-spacing: 0.08em; color: var(--text); margin-top: 4px; }
+.ob-brand span { color: var(--cyan); }
+.ob-step-indicator { display: flex; gap: 6px; justify-content: center; margin-bottom: 2rem; }
+.ob-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border); transition: all .3s; }
+.ob-dot.active { background: var(--cyan); border-color: var(--cyan); width: 20px; border-radius: 3px; }
+.ob-dot.done { background: rgba(0,229,176,0.4); border-color: rgba(0,229,176,0.4); }
+.ob-title { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 8px; line-height: 1.3; }
+.ob-title span { color: var(--cyan); }
+.ob-desc { font-size: 13px; color: var(--text-muted); line-height: 1.7; margin-bottom: 1.75rem; }
+.ob-science { background: var(--cyan-dim); border: 1px solid rgba(0,229,176,0.2); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 1.75rem; }
+.ob-science-label { font-family: var(--font-mono); font-size: 9px; color: var(--cyan); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 4px; }
+.ob-science-text { font-size: 12px; color: rgba(0,229,176,0.8); line-height: 1.6; }
+.ob-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 1.75rem; }
+.ob-option {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: var(--radius); padding: 14px 16px; cursor: pointer;
+  transition: all .2s; display: flex; align-items: center; gap: 14px;
+}
+.ob-option:active { opacity: 0.75; }
+.ob-option.selected { border-color: var(--cyan); background: var(--cyan-dim); }
+.ob-option-icon { font-size: 22px; flex-shrink: 0; }
+.ob-option-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
+.ob-option-desc { font-size: 11px; color: var(--text-dim); }
+.ob-tad-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 1.75rem; }
+.ob-tad-row { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; }
+.ob-tad-num { font-family: var(--font-mono); font-size: 11px; color: var(--cyan); flex-shrink: 0; width: 20px; }
+.ob-tad-input { flex: 1; background: none; border: none; outline: none; font-family: var(--font-display); font-size: 13px; color: var(--text); }
+.ob-tad-input::placeholder { color: var(--text-dim); }
+.ob-btn {
+  width: 100%; padding: 14px; background: var(--cyan); border: none;
+  border-radius: var(--radius); font-family: var(--font-display); font-size: 14px;
+  font-weight: 700; color: #000; cursor: pointer; letter-spacing: 0.04em;
+  transition: opacity .15s; display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.ob-btn:active { opacity: 0.8; }
+.ob-btn.secondary { background: none; border: 1.5px solid var(--border-strong); color: var(--cyan); }
+.ob-skip { text-align: center; margin-top: 14px; font-size: 12px; color: var(--text-dim); cursor: pointer; text-decoration: underline; }
+.ob-welcome { text-align: center; }
+.ob-welcome-icon { font-size: 48px; margin-bottom: 16px; }
+.ob-welcome-title { font-size: 22px; font-weight: 700; color: var(--cyan); margin-bottom: 8px; }
+.ob-welcome-sub { font-size: 13px; color: var(--text-muted); line-height: 1.7; margin-bottom: 2rem; }
+.ob-chrono-badge { display: inline-block; background: var(--cyan-dim); border: 1px solid rgba(0,229,176,0.3); border-radius: 20px; padding: 6px 16px; font-family: var(--font-mono); font-size: 11px; color: var(--cyan); margin-bottom: 2rem; }
+
+/* ── Header ── */
+.header {
+  padding: 0.9rem 1.25rem 0.85rem;
+  position: sticky; top: 0; background: var(--bg); z-index: 10;
+  border-bottom: 1px solid var(--border);
+}
+.header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand-logo { width: 34px; height: 34px; border-radius: 50%; overflow: hidden; flex-shrink: 0; border: 1.5px solid rgba(0,229,176,0.3); }
+.brand-logo img { width: 100%; height: 100%; object-fit: cover; }
+.brand-text { display: flex; flex-direction: column; line-height: 1.2; }
+.brand-channel { font-size: 9px; font-family: var(--font-mono); color: var(--cyan); letter-spacing: 0.1em; text-transform: uppercase; }
+.brand-name { font-size: 15px; font-weight: 700; letter-spacing: 0.08em; color: var(--text); }
+.brand-name span { color: var(--cyan); }
+.date-pill { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); background: var(--surface2); border: 1px solid var(--border); padding: 3px 9px; border-radius: 20px; }
+
+/* ── Nav ── */
+.nav { display: flex; overflow-x: auto; padding: 0 1.25rem; border-bottom: 1px solid var(--border); scrollbar-width: none; }
+.nav::-webkit-scrollbar { display: none; }
+.nav-btn { font-family: var(--font-display); font-size: 11px; font-weight: 500; color: var(--text-dim); background: none; border: none; padding: 10px 13px; cursor: pointer; white-space: nowrap; border-bottom: 2px solid transparent; transition: color .2s, border-color .2s; letter-spacing: 0.05em; }
+.nav-btn.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+
+.content { padding: 1.25rem; }
+.tab { display: none; }
+.tab.active { display: block; }
+
+/* ── Alert ── */
+.alert { background: var(--orange-dim); border: 1px solid var(--orange); border-radius: var(--radius); padding: 12px 14px; font-size: 12px; color: var(--orange); margin-bottom: 1.25rem; display: flex; align-items: flex-start; gap: 10px; line-height: 1.5; }
+
+/* ── Install banner ── */
+.install-banner { background: var(--cyan-dim); border: 1px solid rgba(0,229,176,0.25); border-radius: var(--radius); padding: 11px 14px; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 12px; }
+.install-banner-text { flex: 1; font-size: 12px; color: var(--cyan); line-height: 1.5; }
+.install-banner-text strong { display: block; margin-bottom: 1px; font-size: 13px; }
+
+/* ── Section label ── */
+.section-label { font-family: var(--font-mono); font-size: 10px; color: var(--text-dim); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 10px; margin-top: 1.4rem; }
+.section-label:first-child { margin-top: 0; }
+
+/* ── Card ── */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.card + .card { margin-top: 10px; }
+
+/* ── TAD ── */
+.tad-row { display: flex; align-items: center; gap: 12px; padding: 13px 14px; border-bottom: 1px solid var(--border); }
+.tad-row:last-of-type { border-bottom: none; }
+.tad-check { width: 20px; height: 20px; border: 1.5px solid var(--text-dim); border-radius: 4px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: background .15s, border-color .15s; }
+.tad-check.done { background: var(--cyan); border-color: var(--cyan); }
+.tad-check.done::after { content: '✓'; font-size: 12px; color: #000; font-weight: 700; }
+.tad-input { flex: 1; background: none; border: none; outline: none; font-family: var(--font-display); font-size: 13px; color: var(--text); line-height: 1.4; }
+.tad-input::placeholder { color: var(--text-dim); }
+.tad-input.done { text-decoration: line-through; color: var(--text-dim); }
+.tad-num { font-family: var(--font-mono); font-size: 10px; color: var(--text-dim); flex-shrink: 0; }
+
+/* ── Progress ── */
+.progress-area { padding: 12px 14px; border-top: 1px solid var(--border); }
+.progress-track { height: 4px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--cyan); border-radius: 2px; transition: width .4s; }
+.progress-meta { display: flex; justify-content: space-between; margin-top: 6px; }
+.progress-meta span { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); }
+.progress-meta strong { font-family: var(--font-mono); font-size: 11px; color: var(--cyan); }
+
+/* ── Timer ── */
+.timer-display { text-align: center; padding: 1.4rem 1rem 1rem; }
+.timer-num { font-family: var(--font-mono); font-size: 48px; color: var(--text); letter-spacing: 0.04em; font-weight: 500; }
+.timer-num.running { color: var(--cyan); }
+.timer-status { font-size: 11px; color: var(--text-muted); margin-top: 6px; letter-spacing: 0.02em; text-align: center; line-height: 1.6; padding: 0 12px; }
+.timer-btns { display: flex; gap: 8px; padding: 0 14px 14px; }
+
+/* ── Buttons ── */
+.btn { flex: 1; padding: 10px; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); background: none; cursor: pointer; font-family: var(--font-display); font-size: 12px; font-weight: 500; color: var(--text); transition: background .15s; letter-spacing: 0.04em; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.btn:hover { background: var(--surface2); }
+.btn:active { opacity: 0.75; }
+.btn.primary { background: var(--cyan-dim); border-color: var(--cyan); color: var(--cyan); }
+.btn.primary:hover { background: var(--cyan-mid); }
+.btn.full { flex: none; width: 100%; }
+.btn.orange { border-color: var(--orange); color: var(--orange); background: var(--orange-dim); }
+.btn.sm { padding: 7px 12px; font-size: 11px; flex: none; width: auto; }
+
+/* ── Protocol ── */
+.proto-item { display: flex; gap: 12px; padding: 13px 14px; border-bottom: 1px solid var(--border); }
+.proto-item:last-child { border-bottom: none; }
+.proto-icon { font-size: 18px; flex-shrink: 0; width: 28px; text-align: center; }
+.proto-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+.proto-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+.proto-ref { font-size: 10px; color: var(--text-dim); margin-top: 3px; font-family: var(--font-mono); }
+
+/* ── No screen ── */
+.no-screen { background: var(--orange-dim); border: 1px solid rgba(255,107,53,0.3); border-radius: var(--radius); padding: 12px 14px; margin-top: 10px; }
+.no-screen-title { font-size: 12px; font-weight: 500; color: var(--orange); margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+.no-screen-desc { font-size: 11px; color: rgba(255,107,53,0.65); line-height: 1.5; }
+
+/* ── Select ── */
+.select-row { display: flex; align-items: center; justify-content: space-between; padding: 13px 14px; }
+.select-label { font-size: 13px; color: var(--text-muted); }
+select { background: var(--surface2); border: 1px solid var(--border-strong); border-radius: var(--radius-sm); color: var(--text); font-family: var(--font-display); font-size: 12px; padding: 5px 10px; cursor: pointer; }
+
+/* ── Cierre ── */
+.cierre-step { display: flex; gap: 12px; padding: 14px; border-bottom: 1px solid var(--border); }
+.cierre-step:last-child { border-bottom: none; }
+.step-circle { width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--border-strong); display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); flex-shrink: 0; transition: all .2s; }
+.step-circle.done { background: var(--cyan); border-color: var(--cyan); color: #000; font-weight: 700; }
+.step-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+.step-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; line-height: 1.5; }
+.cierre-input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 10px; font-family: var(--font-display); font-size: 12px; color: var(--text); outline: none; margin-bottom: 6px; transition: border-color .15s; }
+.cierre-input:focus { border-color: var(--cyan); }
+.cierre-input::placeholder { color: var(--text-dim); }
+.check-label { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); margin-bottom: 8px; cursor: pointer; }
+.check-label input { accent-color: var(--cyan); width: 14px; height: 14px; cursor: pointer; }
+
+/* ── Day closed ── */
+.day-closed { background: var(--cyan-dim); border: 1px solid rgba(0,229,176,0.3); border-radius: var(--radius); padding: 1.5rem; text-align: center; margin-top: 10px; }
+.day-closed-icon { font-size: 28px; margin-bottom: 8px; }
+.day-closed-title { font-size: 15px; font-weight: 500; color: var(--cyan); margin-bottom: 4px; }
+.day-closed-sub { font-size: 12px; color: rgba(0,229,176,0.5); }
+
+/* ── Stats ── */
+.stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; text-align: center; }
+.stat-val { font-family: var(--font-mono); font-size: 22px; color: var(--cyan); font-weight: 500; }
+.stat-lbl { font-size: 10px; color: var(--text-dim); margin-top: 3px; letter-spacing: 0.04em; }
+.bars-wrap { padding: 14px; }
+.bars { display: flex; gap: 2px; align-items: flex-end; height: 90px; margin-bottom: 8px; }
+.bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; }
+.bar-bg { width: 100%; flex: 1; background: var(--surface2); border-radius: 3px; position: relative; overflow: hidden; min-height: 4px; }
+.bar-fg { position: absolute; bottom: 0; width: 100%; background: var(--cyan); border-radius: 3px; transition: height .5s; opacity: 0.8; }
+.bar-fg.zero { background: var(--border-strong); height: 4px !important; }
+.bar-day { font-family: var(--font-mono); font-size: 9px; color: var(--text-dim); }
+.bar-today .bar-day { color: var(--cyan); }
+
+/* ── Diagnóstico ── */
+.diag-q { margin-bottom: 14px; }
+.diag-label { font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 6px; display: block; }
+textarea { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 10px; resize: none; font-family: var(--font-display); font-size: 12px; color: var(--text); outline: none; line-height: 1.5; transition: border-color .15s; }
+textarea:focus { border-color: var(--cyan); }
+textarea::placeholder { color: var(--text-dim); }
+.history-week { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 8px; }
+.history-week-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; cursor: pointer; }
+.history-week-title { font-size: 11px; font-weight: 500; color: var(--text-muted); font-family: var(--font-mono); }
+.history-week-badge { font-size: 10px; color: var(--cyan); font-family: var(--font-mono); }
+.history-week-body { display: none; padding: 10px 14px; border-top: 1px solid var(--border); }
+.history-week-body.open { display: block; }
+.history-diag-item { margin-bottom: 10px; }
+.history-diag-item:last-child { margin-bottom: 0; }
+.history-diag-q { font-size: 10px; color: var(--text-dim); margin-bottom: 3px; font-family: var(--font-mono); letter-spacing: 0.04em; }
+.history-diag-a { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+.monthly-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.monthly-cell { background: var(--surface2); border-radius: var(--radius-sm); padding: 10px; }
+.monthly-cell-week { font-size: 9px; color: var(--text-dim); font-family: var(--font-mono); margin-bottom: 4px; }
+.monthly-cell-val { font-size: 18px; font-weight: 500; color: var(--cyan); font-family: var(--font-mono); }
+.monthly-cell-lbl { font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+.monthly-insight { font-size: 12px; color: var(--text-muted); line-height: 1.7; padding: 12px; background: var(--cyan-dim); border-radius: var(--radius-sm); border: 1px solid rgba(0,229,176,0.2); }
+.archived-month { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 8px; }
+.archived-month-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; cursor: pointer; }
+.archived-month-title { font-size: 12px; font-weight: 500; color: var(--text-muted); }
+.archived-month-badge { font-size: 10px; color: var(--cyan); font-family: var(--font-mono); }
+.archived-month-body { display: none; padding: 14px; border-top: 1px solid var(--border); }
+.archived-month-body.open { display: block; }
+
+/* ── Backup ── */
+.backup-row { display: flex; align-items: center; gap: 12px; padding: 14px; border-bottom: 1px solid var(--border); }
+.backup-row:last-child { border-bottom: none; }
+.backup-info { flex: 1; }
+.backup-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
+.backup-desc { font-size: 11px; color: var(--text-muted); line-height: 1.4; }
+.backup-msg { margin-top: 10px; padding: 10px 14px; border-radius: var(--radius-sm); font-size: 12px; display: none; }
+.backup-msg.ok { background: var(--cyan-dim); color: var(--cyan); border: 1px solid rgba(0,229,176,0.3); }
+.backup-msg.err { background: var(--orange-dim); color: var(--orange); border: 1px solid rgba(255,107,53,0.3); }
+
+/* ── About ── */
+.about-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-top: 10px; }
+.about-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+.about-logo { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; border: 1.5px solid rgba(0,229,176,0.3); flex-shrink: 0; }
+.about-logo img { width: 100%; height: 100%; object-fit: cover; }
+.about-channel { font-size: 10px; font-family: var(--font-mono); color: var(--cyan); letter-spacing: 0.1em; }
+.about-title { font-size: 14px; font-weight: 500; color: var(--text); }
+.about-text { font-size: 12px; color: var(--text-muted); line-height: 1.7; }
+
+/* ── CARD COMPARTILHÁVEL ── */
+#share-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 500;
+  display: none; align-items: center; justify-content: center;
+  padding: 1.5rem; backdrop-filter: blur(4px);
+}
+#share-overlay.visible { display: flex; }
+.share-modal { width: 100%; max-width: 360px; }
+.share-card {
+  background: #0a0a0a; border: 1px solid rgba(0,229,176,0.3);
+  border-radius: 16px; padding: 24px; margin-bottom: 14px;
+  position: relative; overflow: hidden;
+}
+.share-card::before {
+  content: ''; position: absolute; top: -60px; right: -60px;
+  width: 180px; height: 180px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,229,176,0.12) 0%, transparent 70%);
+}
+.share-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.share-card-brand { display: flex; align-items: center; gap: 8px; }
+.share-card-logo { width: 28px; height: 28px; border-radius: 50%; overflow: hidden; border: 1px solid rgba(0,229,176,0.4); flex-shrink: 0; background: #111; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+.share-card-name { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; color: var(--text); }
+.share-card-name span { color: var(--cyan); }
+.share-card-date { font-family: var(--font-mono); font-size: 9px; color: var(--text-dim); }
+.share-big-num { font-family: var(--font-mono); font-size: 56px; font-weight: 500; color: var(--cyan); line-height: 1; margin-bottom: 4px; }
+.share-big-label { font-size: 11px; color: var(--text-muted); letter-spacing: 0.06em; margin-bottom: 20px; }
+.share-metrics { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 20px; }
+.share-metric { background: rgba(255,255,255,0.04); border-radius: 8px; padding: 10px 8px; text-align: center; }
+.share-metric-val { font-family: var(--font-mono); font-size: 16px; color: var(--text); font-weight: 500; }
+.share-metric-lbl { font-size: 9px; color: var(--text-dim); margin-top: 2px; letter-spacing: 0.04em; }
+.share-tads { margin-bottom: 16px; }
+.share-tad { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.share-tad-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); flex-shrink: 0; }
+.share-tad-dot.empty { background: var(--text-dim); opacity: 0.4; }
+.share-tad-text { font-size: 11px; color: var(--text-muted); }
+.share-tad-text.done-text { color: var(--cyan); }
+.share-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 14px; border-top: 1px solid var(--border); }
+.share-footer-left { font-family: var(--font-mono); font-size: 9px; color: var(--text-dim); }
+.share-footer-right { font-size: 9px; color: rgba(0,229,176,0.5); }
+.share-streak-bar { display: flex; gap: 3px; margin-bottom: 20px; }
+.share-streak-dot { flex: 1; height: 4px; border-radius: 2px; background: var(--surface2); }
+.share-streak-dot.filled { background: var(--cyan); }
+.share-streak-dot.today { background: var(--cyan); box-shadow: 0 0 6px var(--cyan); }
+.share-actions { display: flex; gap: 8px; }
+.share-close { text-align: center; margin-top: 12px; font-size: 12px; color: var(--text-dim); cursor: pointer; }
+
+/* ── Mantenimiento banner ── */
+.mant-banner { background: var(--orange-dim); border: 1px solid var(--orange); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 1.25rem; display: none; align-items: flex-start; gap: 10px; }
+.mant-banner.visible { display: flex; }
+
+/* ── Cronotype badge ── */
+.chrono-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-top: 1px solid var(--border); }
+.chrono-badge { font-family: var(--font-mono); font-size: 10px; color: var(--cyan); background: var(--cyan-dim); border: 1px solid rgba(0,229,176,0.2); border-radius: 20px; padding: 3px 10px; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     ONBOARDING OVERLAY
+══════════════════════════════════════════ -->
+<div id="onboarding">
+  <!-- Step 0: Bienvenida -->
+  <div class="ob-step" id="ob-step-0">
+    <div class="ob-logo">
+      <div class="ob-logo-img"><img src="data:image/png;base64,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" alt="logo"></div>
+      <div class="ob-channel">Radiografía Mental</div>
+      <div class="ob-brand">NEURO<span>SYSTEM</span></div>
+    </div>
+    <div class="ob-step-indicator">
+      <div class="ob-dot active" id="dot-0"></div>
+      <div class="ob-dot" id="dot-1"></div>
+      <div class="ob-dot" id="dot-2"></div>
+      <div class="ob-dot" id="dot-3"></div>
+    </div>
+    <div class="ob-title">Bienvenido al sistema de<br><span>alto rendimiento</span></div>
+    <div class="ob-desc">En 60 segundos configuramos tu NEUROSYSTEM para que funcione exactamente para tu biología. No para la de alguien más.</div>
+    <div class="ob-science">
+      <div class="ob-science-label">⚡ Base científica</div>
+      <div class="ob-science-text">Tu cerebro opera en ciclos ultradianos de 90 minutos. Configurar el sistema según tu cronotipo maximiza la eficiencia del córtex prefrontal.</div>
+    </div>
+    <button class="ob-btn" onclick="obNext(1)">Comenzar configuración →</button>
+    <div class="ob-skip" onclick="skipOnboarding()">Ya conozco el sistema, saltar</div>
+  </div>
+
+  <!-- Step 1: Cronotipo -->
+  <div class="ob-step" id="ob-step-1" style="display:none">
+    <div class="ob-step-indicator">
+      <div class="ob-dot done"></div>
+      <div class="ob-dot active"></div>
+      <div class="ob-dot"></div>
+      <div class="ob-dot"></div>
+    </div>
+    <div class="ob-title">¿Cuál es tu<br><span>cronotipo</span>?</div>
+    <div class="ob-desc">Esto define en qué ventana horaria tu córtex prefrontal opera con máxima eficiencia. Cap. 1 · NEUROSYSTEM</div>
+    <div class="ob-options">
+      <div class="ob-option" id="chrono-mat" onclick="selectChrono('mat')">
+        <div class="ob-option-icon">🌅</div>
+        <div>
+          <div class="ob-option-title">Matutino — Pico temprano</div>
+          <div class="ob-option-desc">Tu mejor foco es entre las 5 y las 10 AM</div>
+        </div>
+      </div>
+      <div class="ob-option" id="chrono-int" onclick="selectChrono('int')">
+        <div class="ob-option-icon">☀️</div>
+        <div>
+          <div class="ob-option-title">Intermedio — Pico gradual</div>
+          <div class="ob-option-desc">Tu mejor foco es entre las 9 AM y la 1 PM</div>
+        </div>
+      </div>
+      <div class="ob-option" id="chrono-noc" onclick="selectChrono('noc')">
+        <div class="ob-option-icon">🌙</div>
+        <div>
+          <div class="ob-option-title">Nocturno — Pico tardío</div>
+          <div class="ob-option-desc">Tu mejor foco es entre las 5 y las 10 PM</div>
+        </div>
+      </div>
+    </div>
+    <button class="ob-btn" id="ob-btn-1" onclick="obNext(2)" style="opacity:0.4;pointer-events:none">Continuar →</button>
+  </div>
+
+  <!-- Step 2: Primera TAD -->
+  <div class="ob-step" id="ob-step-2" style="display:none">
+    <div class="ob-step-indicator">
+      <div class="ob-dot done"></div>
+      <div class="ob-dot done"></div>
+      <div class="ob-dot active"></div>
+      <div class="ob-dot"></div>
+    </div>
+    <div class="ob-title">Define tus <span>3 TADs</span><br>de hoy</div>
+    <div class="ob-desc">Una TAD es la tarea que, si se completa, justifica el día. No la más urgente — la más importante. Al menos escribe la primera.</div>
+    <div class="ob-science">
+      <div class="ob-science-label">🧠 Efecto Zeigarnik</div>
+      <div class="ob-science-text">Escribir las tareas en un sistema externo libera la tensión cognitiva que tu cerebro mantiene activa en segundo plano. Mejor foco, menos ruido mental.</div>
+    </div>
+    <div class="ob-tad-list">
+      <div class="ob-tad-row">
+        <span class="ob-tad-num">01</span>
+        <input class="ob-tad-input" id="ob-t0" placeholder="Tarea crítica de hoy..." />
+      </div>
+      <div class="ob-tad-row">
+        <span class="ob-tad-num">02</span>
+        <input class="ob-tad-input" id="ob-t1" placeholder="Segunda prioridad..." />
+      </div>
+      <div class="ob-tad-row">
+        <span class="ob-tad-num">03</span>
+        <input class="ob-tad-input" id="ob-t2" placeholder="Tercera prioridad..." />
+      </div>
+    </div>
+    <button class="ob-btn" onclick="obSaveTads()">Guardar y continuar →</button>
+    <div class="ob-skip" onclick="obNext(3)">Definir después</div>
+  </div>
+
+  <!-- Step 3: Listo -->
+  <div class="ob-step ob-welcome" id="ob-step-3" style="display:none">
+    <div class="ob-step-indicator">
+      <div class="ob-dot done"></div>
+      <div class="ob-dot done"></div>
+      <div class="ob-dot done"></div>
+      <div class="ob-dot active"></div>
+    </div>
+    <div class="ob-welcome-icon">✦</div>
+    <div class="ob-welcome-title">Sistema activado</div>
+    <div id="ob-chrono-badge" class="ob-chrono-badge">Cronotipo: Intermedio ☀️</div>
+    <div class="ob-welcome-sub">Tu NEUROSYSTEM está configurado.<br>El primer paso: activa el temporizador de 90 minutos cuando estés listo para el bloque de foco.</div>
+    <button class="ob-btn" onclick="finishOnboarding()">✦ Comenzar mi primer bloque</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MAIN APP
+══════════════════════════════════════════ -->
+<div class="header">
+  <div class="header-top">
+    <div class="brand">
+      <div class="brand-logo">
+        <img src="data:image/png;base64,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" alt="RM" />
+      </div>
+      <div class="brand-text">
+        <span class="brand-channel">Radiografía Mental</span>
+        <span class="brand-name">NEURO<span>SYSTEM</span></span>
+      </div>
+    </div>
+    <div class="date-pill" id="date-label"></div>
+  </div>
+</div>
+
+<nav class="nav">
+  <button class="nav-btn active" onclick="showTab('foco',this)">FOCO</button>
+  <button class="nav-btn" onclick="showTab('valle',this)">VALLE</button>
+  <button class="nav-btn" onclick="showTab('cierre',this)">CIERRE PM</button>
+  <button class="nav-btn" onclick="showTab('semana',this)">PROGRESO</button>
+  <button class="nav-btn" onclick="showTab('datos',this)">DATOS</button>
+</nav>
+
+<div class="content">
+
+<!-- TAB FOCO -->
+<div id="tab-foco" class="tab active">
+  <div id="alert-box" class="alert" style="display:none">
+    <div style="font-size:16px;flex-shrink:0">⚠</div>
+    <div><strong>Un día no destruye el circuito.</strong> El compromiso es hoy. — Regla de los Dos Días · Cap. 3</div>
+  </div>
+
+  <!-- Modo mantenimiento -->
+  <div id="mant-banner" class="mant-banner">
+    <div style="font-size:16px;flex-shrink:0">🛠</div>
+    <div style="flex:1">
+      <strong style="display:block;color:var(--orange);font-size:13px;margin-bottom:2px">Día de Mantenimiento activo</strong>
+      <span style="font-size:12px;color:rgba(255,107,53,0.8)">Solo 1 TAD hoy. Energía reducida = recursos limitados. No es rendirse, es operar con lo disponible. Cap. 2</span>
+    </div>
+    <button class="btn sm orange" onclick="disableMantMode()" style="flex:none;font-size:10px;padding:5px 8px">✕</button>
+  </div>
+
+  <div id="focus-lock-banner" class="alert" style="display:none;background:rgba(0,229,176,0.08);border-color:var(--cyan)">
+    <div style="font-size:16px;flex-shrink:0">🔒</div>
+    <div style="color:var(--cyan)"><strong>Bloque de foco activo.</strong> Las TADs y la navegación están bloqueadas. Pausa el temporizador para editarlas.</div>
+  </div>
+
+  <div id="install-banner" class="install-banner" style="display:none">
+    <div style="font-size:20px">📲</div>
+    <div class="install-banner-text">
+      <strong>Instala como app</strong>
+      Agrega a pantalla de inicio para proteger tus datos.
+    </div>
+    <button class="btn sm primary" onclick="installPWA()">Instalar</button>
+  </div>
+
+  <div class="section-label">Tareas de Alto Desempeño — Cap. 2</div>
+  <div class="card">
+    <div class="tad-row" id="tad-row-0">
+      <span class="tad-num">01</span>
+      <div class="tad-check" id="c0" onclick="toggleTad(0)"></div>
+      <input class="tad-input" id="t0" placeholder="Tarea crítica que no puede quedar sin hacer hoy" />
+    </div>
+    <div class="tad-row" id="tad-row-1">
+      <span class="tad-num">02</span>
+      <div class="tad-check" id="c1" onclick="toggleTad(1)"></div>
+      <input class="tad-input" id="t1" placeholder="Segunda tarea de alta prioridad" />
+    </div>
+    <div class="tad-row" id="tad-row-2">
+      <span class="tad-num">03</span>
+      <div class="tad-check" id="c2" onclick="toggleTad(2)"></div>
+      <input class="tad-input" id="t2" placeholder="Tercera tarea de alta prioridad" />
+    </div>
+    <div class="progress-area">
+      <div class="progress-track"><div class="progress-fill" id="prog" style="width:0%"></div></div>
+      <div class="progress-meta">
+        <span>tasa de ejecución</span>
+        <strong id="pct-val">0%</strong>
+      </div>
+    </div>
+    <div class="chrono-row">
+      <span style="font-size:11px;color:var(--text-dim)">Tu ventana de pico</span>
+      <span class="chrono-badge" id="chrono-display" onclick="showTab('datos',document.querySelectorAll('.nav-btn')[4])">— Configurar</span>
+    </div>
+  </div>
+
+  <!-- Modo mantenimiento trigger -->
+  <div style="text-align:right;margin-top:8px">
+    <span style="font-size:11px;color:var(--text-dim);cursor:pointer" onclick="enableMantMode()">🛠 Activar Día de Mantenimiento</span>
+  </div>
+
+  <div class="section-label">Bloque de Foco — 90 min · Cap. 1</div>
+  <div class="card">
+    <div class="timer-display">
+      <div class="timer-num" id="timer-num">90:00</div>
+      <div class="timer-status" id="timer-status">Tu mente no necesita más motivación. Necesita menos fricción.</div>
+    </div>
+    <div class="timer-btns">
+      <button class="btn primary" id="btn-start" onclick="timerAction('start')">▶ Iniciar</button>
+      <button class="btn" id="btn-pause" onclick="timerAction('pause')" style="display:none">⏸ Pausar</button>
+      <button class="btn" onclick="timerAction('reset')">↺ Reset</button>
+    </div>
+  </div>
+</div>
+
+<!-- TAB VALLE -->
+<div id="tab-valle" class="tab">
+  <div class="section-label">Protocolo de Recuperación Válido — Cap. 1</div>
+  <div class="card">
+    <div class="proto-item">
+      <div class="proto-icon">🚶</div>
+      <div>
+        <div class="proto-title">Movimiento</div>
+        <div class="proto-desc">Camina 5 minutos. Estiramiento suave. Evita estar sentado durante el valle.</div>
+        <div class="proto-ref">NEUROSYSTEM · Radiografía Mental</div>
+      </div>
+    </div>
+    <div class="proto-item">
+      <div class="proto-icon">💧</div>
+      <div>
+        <div class="proto-title">Hidratación</div>
+        <div class="proto-desc">Bebe un vaso de agua. Sin cafeína en valles después de las 14 h.</div>
+        <div class="proto-ref">NEUROSYSTEM · Radiografía Mental</div>
+      </div>
+    </div>
+    <div class="proto-item">
+      <div class="proto-icon">🌬</div>
+      <div>
+        <div class="proto-title">Box Breathing</div>
+        <div class="proto-desc">Inhala 4 s → Retén 4 s → Exhala 4 s → Retén 4 s. Repite 4 veces.</div>
+        <div class="proto-ref">NEUROSYSTEM · Radiografía Mental</div>
+      </div>
+    </div>
+    <div class="proto-item">
+      <div class="proto-icon">🏔</div>
+      <div>
+        <div class="proto-title">Vista al horizonte</div>
+        <div class="proto-desc">Mira un punto lejano por 2 minutos. Activa el descanso visual profundo.</div>
+        <div class="proto-ref">NEUROSYSTEM · Radiografía Mental</div>
+      </div>
+    </div>
+  </div>
+  <div class="no-screen">
+    <div class="no-screen-title">📵 Prohibido el uso de pantallas</div>
+    <div class="no-screen-desc">Cap. 1 — Las redes sociales activan el mismo circuito de recompensa que el trabajo. Un valle falso no recupera el sistema nervioso.</div>
+  </div>
+  <div class="section-label" style="margin-top:1.25rem">Registro del Valle</div>
+  <div class="card">
+    <div class="select-row">
+      <span class="select-label">¿Fue un valle real o falso?</span>
+      <select id="valle-sel" onchange="saveValle()">
+        <option value="">— Seleccionar —</option>
+        <option value="real">Valle real 🌳</option>
+        <option value="falso">Valle falso 📱</option>
+      </select>
+    </div>
+  </div>
+  <div class="section-label">Temporizador de Valle — 15 min</div>
+  <div class="card">
+    <div class="timer-display">
+      <div class="timer-num" id="v-timer-num">15:00</div>
+      <div class="timer-status" id="v-timer-status">listo para iniciar</div>
+    </div>
+    <div class="timer-btns">
+      <button class="btn primary" id="vbtn-start" onclick="vTimerAction('start')">▶ Iniciar</button>
+      <button class="btn" id="vbtn-pause" onclick="vTimerAction('pause')" style="display:none">⏸ Pausar</button>
+      <button class="btn" onclick="vTimerAction('reset')">↺ Reset</button>
+    </div>
+  </div>
+</div>
+
+<!-- TAB CIERRE PM -->
+<div id="tab-cierre" class="tab">
+  <div class="section-label">Rutina de Cierre PM — Cap. 2</div>
+  <div class="card">
+    <div class="cierre-step">
+      <div class="step-circle" id="s1">1</div>
+      <div style="flex:1">
+        <div class="step-title">Revisión de TADs completadas</div>
+        <div class="step-desc">Marca las tareas hechas. Libera el Efecto Zeigarnik y cierra los loops abiertos del día.</div>
+        <button class="btn sm" onclick="doneStep(1)">✓ Listo</button>
+      </div>
+    </div>
+    <div class="cierre-step">
+      <div class="step-circle" id="s2">2</div>
+      <div style="flex:1">
+        <div class="step-title">TADs de mañana</div>
+        <div class="step-desc">Define las 3 tareas del día siguiente antes de dormir. Cap. 2 — protocolo de planificación nocturna.</div>
+        <input class="cierre-input" id="m0" placeholder="TAD 1 de mañana" />
+        <input class="cierre-input" id="m1" placeholder="TAD 2 de mañana" />
+        <input class="cierre-input" id="m2" placeholder="TAD 3 de mañana" />
+        <button class="btn sm" style="margin-top:4px" onclick="doneStep(2)">✓ Guardar</button>
+      </div>
+    </div>
+    <div class="cierre-step">
+      <div class="step-circle" id="s3">3</div>
+      <div style="flex:1">
+        <div class="step-title">Checklist de preparación</div>
+        <div class="step-desc">Confirma los preparativos. Cap. 2 — reducción de fricción matutina.</div>
+        <label class="check-label"><input type="checkbox" /> Ropa seleccionada para mañana</label>
+        <label class="check-label"><input type="checkbox" /> Espacio de trabajo ordenado</label>
+        <label class="check-label"><input type="checkbox" /> Teléfono en modo no molestar</label>
+        <label class="check-label"><input type="checkbox" /> Hora de dormir definida</label>
+        <button class="btn primary full" style="margin-top:10px" onclick="closeDia()">🌙 Cerrar el día</button>
+      </div>
+    </div>
+  </div>
+  <div id="day-done" style="display:none" class="day-closed">
+    <div class="day-closed-icon">✦</div>
+    <div class="day-closed-title">Día cerrado correctamente</div>
+    <div class="day-closed-sub">Protocolo NEUROSYSTEM · Radiografía Mental</div>
+  </div>
+</div>
+
+<!-- TAB SEMANA -->
+<div id="tab-semana" class="tab">
+  <div class="section-label">Meta-análisis — últimos 30 días · Cap. 4</div>
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-val" id="s-avg">—</div><div class="stat-lbl">promedio TAD</div></div>
+    <div class="stat-card"><div class="stat-val" id="s-streak">—</div><div class="stat-lbl">días activos</div></div>
+    <div class="stat-card"><div class="stat-val" id="s-valles">—</div><div class="stat-lbl">valles reales</div></div>
+  </div>
+  <div class="card">
+    <div class="bars-wrap">
+      <div class="bars" id="week-bars"></div>
+      <div style="display:flex;gap:6px" id="week-days"></div>
+    </div>
+  </div>
+  <div class="section-label" style="margin-top:1.25rem">Diagnóstico semanal — 4 dimensiones · Cap. 4</div>
+  <div class="card" style="padding:14px">
+    <div class="diag-q">
+      <label class="diag-label">1 · Consistencia — ¿Cuántos días completé las 3 TADs?</label>
+      <textarea id="diag-1" rows="2" placeholder="Anota el patrón que observas esta semana..."></textarea>
+    </div>
+    <div class="diag-q">
+      <label class="diag-label">2 · Patrón de días malos — ¿Qué contextos generan fallas?</label>
+      <textarea id="diag-2" rows="2" placeholder="¿Qué días o situaciones detonaron la falla?"></textarea>
+    </div>
+    <div class="diag-q">
+      <label class="diag-label">3 · Calibración — ¿Las TADs fueron bien dimensionadas?</label>
+      <textarea id="diag-3" rows="2" placeholder="¿Demasiado grandes, demasiado pequeñas?"></textarea>
+    </div>
+    <div class="diag-q" style="margin-bottom:10px">
+      <label class="diag-label">4 · Valle real vs. falso — ¿Qué contaminó los valles?</label>
+      <textarea id="diag-4" rows="2" placeholder="¿Cuántos valles fueron reales esta semana?"></textarea>
+    </div>
+    <button class="btn primary full" onclick="saveDiagnostico()">💾 Guardar diagnóstico</button>
+    <div id="diag-saved-msg" style="display:none;margin-top:8px;font-size:11px;color:var(--cyan);text-align:center">✓ Diagnóstico guardado correctamente</div>
+  </div>
+  <div class="section-label" style="margin-top:1.25rem">Historial de semanas</div>
+  <div id="diag-history-list"></div>
+  <div id="monthly-summary-section" style="display:none">
+    <div class="section-label" style="margin-top:1.25rem">🗓 Cierre mensual — 4 semanas completadas</div>
+    <div class="card" style="padding:14px" id="monthly-summary-card"></div>
+    <button class="btn primary full" style="margin-top:10px" onclick="closeMes()">✦ Cerrar este mes e iniciar nuevo ciclo</button>
+  </div>
+  <div id="archived-months-section" style="display:none">
+    <div class="section-label" style="margin-top:1.25rem">📁 Meses cerrados</div>
+    <div id="archived-months-list"></div>
+  </div>
+</div>
+
+<!-- TAB DATOS -->
+<div id="tab-datos" class="tab">
+  <div class="section-label">Tu perfil</div>
+  <div class="card">
+    <div class="select-row">
+      <span class="select-label">Cronotipo</span>
+      <select id="chrono-sel" onchange="saveChrono()">
+        <option value="">— Seleccionar —</option>
+        <option value="mat">🌅 Matutino (5–10 AM)</option>
+        <option value="int">☀️ Intermedio (9 AM–1 PM)</option>
+        <option value="noc">🌙 Nocturno (5–10 PM)</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="section-label" style="margin-top:1.4rem">Copia de seguridad</div>
+  <div class="card">
+    <div class="backup-row">
+      <div class="backup-info">
+        <div class="backup-title">Exportar datos</div>
+        <div class="backup-desc">Descarga tu historial completo en Google Drive o iCloud.</div>
+      </div>
+      <button class="btn sm primary" onclick="exportData()">↓ Exportar</button>
+    </div>
+    <div class="backup-row">
+      <div class="backup-info">
+        <div class="backup-title">Importar datos</div>
+        <div class="backup-desc">Restaura tu historial desde un archivo de respaldo.</div>
+      </div>
+      <button class="btn sm" onclick="document.getElementById('import-file').click()">↑ Importar</button>
+      <input type="file" id="import-file" accept=".nsbackup" style="display:none" onchange="importData(event)" />
+    </div>
+  </div>
+  <div id="backup-msg" class="backup-msg"></div>
+
+  <div class="section-label" style="margin-top:1.4rem">Acerca de</div>
+  <div class="about-card">
+    <div class="about-brand">
+      <div class="about-logo">
+        <img src="data:image/png;base64,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" alt="RM" />
+      </div>
+      <div>
+        <div class="about-channel">Radiografía Mental</div>
+        <div class="about-title">NEUROSYSTEM v2.0</div>
+      </div>
+    </div>
+    <div class="about-text">
+      Aplicativo oficial del libro <strong>NEUROSYSTEM</strong>, desarrollado exclusivamente para lectores del canal Radiografía Mental.<br><br>
+      Tus datos se almacenan únicamente en tu dispositivo. Sin servidores externos. Sin cuentas. Privacidad total.
+    </div>
+  </div>
+  <div style="margin-top:10px;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)">
+    <div style="font-size:12px;color:var(--text-dim);line-height:1.8">
+      <div>Versión: <span style="color:var(--text-muted)">2.0.0</span></div>
+      <div>Almacenamiento: <span style="color:var(--cyan)" id="data-size">—</span></div>
+      <div>Días registrados: <span style="color:var(--text-muted)" id="data-days">—</span></div>
+    </div>
+    <button class="btn orange full sm" style="margin-top:12px;width:100%" onclick="confirmReset()">⚠ Borrar todos los datos</button>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SHARE OVERLAY — Card compartilhável
+══════════════════════════════════════════ -->
+<div id="share-overlay">
+  <div class="share-modal">
+    <div class="share-card" id="share-card-inner">
+      <div class="share-card-header">
+        <div class="share-card-brand">
+          <div class="share-card-logo">🧠</div>
+          <div>
+            <div class="share-card-name">NEURO<span>SYSTEM</span></div>
+            <div style="font-size:9px;color:var(--text-dim);font-family:var(--font-mono)">Radiografía Mental</div>
+          </div>
+        </div>
+        <div class="share-card-date" id="sc-date"></div>
+      </div>
+      <!-- Streak dots 7 días -->
+      <div class="share-streak-bar" id="sc-streak-bar"></div>
+      <!-- Big number -->
+      <div class="share-big-num" id="sc-pct">0%</div>
+      <div class="share-big-label" id="sc-pct-label">TASA DE EJECUCIÓN</div>
+      <!-- Metrics -->
+      <div class="share-metrics">
+        <div class="share-metric">
+          <div class="share-metric-val" id="sc-focus">—</div>
+          <div class="share-metric-lbl">MIN FOCO</div>
+        </div>
+        <div class="share-metric">
+          <div class="share-metric-val" id="sc-streak-num">—</div>
+          <div class="share-metric-lbl">RACHA</div>
+        </div>
+        <div class="share-metric">
+          <div class="share-metric-val" id="sc-valle">—</div>
+          <div class="share-metric-lbl">VALLE</div>
+        </div>
+      </div>
+      <!-- TADs -->
+      <div class="share-tads" id="sc-tads"></div>
+      <!-- Footer -->
+      <div class="share-footer">
+        <div class="share-footer-left">neurosystem.radiografiamental.com</div>
+        <div class="share-footer-right">DÍA <span id="sc-day-num">1</span> ✦</div>
+      </div>
+    </div>
+    <div class="share-actions">
+      <button class="btn primary" onclick="downloadCard()">↓ Guardar imagen</button>
+      <button class="btn" onclick="closeShare()">✕ Cerrar</button>
+    </div>
+    <div class="share-close" onclick="closeShare()">Cerrar</div>
+  </div>
+</div>
+
+<script>
+var DAYS_ES = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+var MONTHS_ES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+var today = new Date();
+var todayStr = today.toDateString();
+var STORAGE_KEY = 'ns_v2';
+
+var state = {
+  tads:[false,false,false],
+  tadText:['','',''],
+  weekData:[],
+  valleType:'',
+  cierreSteps:[false,false,false],
+  mañanaTads:['','',''],
+  onboardingDone: false,
+  cronotipo: '',
+  mantMode: false,
+  focusMinutesTotal: 0
+};
+
+function loadState() {
+  try {
+    var raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    var saved = JSON.parse(raw);
+    // Always load persistent fields
+    state.onboardingDone = saved.onboardingDone || false;
+    state.cronotipo = saved.cronotipo || '';
+    state.weekData = saved.weekData || [];
+    state.diagnosticos = saved.diagnosticos || {};
+    state.mesesCerrados = saved.mesesCerrados || [];
+    if (saved.date === todayStr) {
+      state.tads = saved.tads || [false,false,false];
+      state.tadText = saved.tadText || ['','',''];
+      state.valleType = saved.valleType || '';
+      state.cierreSteps = saved.cierreSteps || [false,false,false];
+      state.mañanaTads = saved.mañanaTads || ['','',''];
+      state.mantMode = saved.mantMode || false;
+      state.focusMinutesTotal = saved.focusMinutesTotal || 0;
+    } else {
+      if (saved.mañanaTads && saved.mañanaTads.some(function(t){return t;})) {
+        state.tadText = saved.mañanaTads;
+      }
+    }
+  } catch(e) {}
+}
+
+function save() {
+  try {
+    var s = Object.assign({}, state, {date: todayStr});
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+    updateDataInfo();
+  } catch(e) {}
+}
+
+loadState();
+
+// ── Date label ──
+document.getElementById('date-label').textContent =
+  DAYS_ES[today.getDay()] + ', ' + today.getDate() + ' ' + MONTHS_ES[today.getMonth()];
+
+// ── ONBOARDING ──
+var obChrono = '';
+
+function showOnboarding() {
+  document.getElementById('onboarding').style.display = 'flex';
+}
+function hideOnboarding() {
+  var ob = document.getElementById('onboarding');
+  ob.style.opacity = '0';
+  ob.style.transition = 'opacity .3s';
+  setTimeout(function(){ ob.style.display = 'none'; }, 300);
+}
+
+function obNext(step) {
+  for (var i=0; i<=3; i++) {
+    var el = document.getElementById('ob-step-'+i);
+    if (el) el.style.display = 'none';
+  }
+  var next = document.getElementById('ob-step-'+step);
+  if (next) { next.style.display = 'block'; next.style.animation = 'slideIn .3s ease'; }
+}
+
+function selectChrono(type) {
+  obChrono = type;
+  document.querySelectorAll('.ob-option').forEach(function(o){ o.classList.remove('selected'); });
+  document.getElementById('chrono-'+type).classList.add('selected');
+  var btn = document.getElementById('ob-btn-1');
+  btn.style.opacity = '1';
+  btn.style.pointerEvents = 'auto';
+}
+
+function obSaveTads() {
+  var t0 = document.getElementById('ob-t0').value;
+  var t1 = document.getElementById('ob-t1').value;
+  var t2 = document.getElementById('ob-t2').value;
+  if (t0) { state.tadText[0] = t0; document.getElementById('t0').value = t0; }
+  if (t1) { state.tadText[1] = t1; document.getElementById('t1').value = t1; }
+  if (t2) { state.tadText[2] = t2; document.getElementById('t2').value = t2; }
+  obNext(3);
+  var labels = {mat:'Matutino 🌅', int:'Intermedio ☀️', noc:'Nocturno 🌙'};
+  document.getElementById('ob-chrono-badge').textContent = 'Cronotipo: ' + (labels[obChrono] || 'Intermedio ☀️');
+}
+
+function finishOnboarding() {
+  if (obChrono) { state.cronotipo = obChrono; }
+  state.onboardingDone = true;
+  save();
+  updateChronoDisplay();
+  hideOnboarding();
+}
+
+function skipOnboarding() {
+  state.onboardingDone = true;
+  save();
+  hideOnboarding();
+}
+
+// Show onboarding if not done
+if (!state.onboardingDone) {
+  showOnboarding();
+} else {
+  document.getElementById('onboarding').style.display = 'none';
+}
+
+// ── Cronotipo display ──
+function updateChronoDisplay() {
+  var el = document.getElementById('chrono-display');
+  var sel = document.getElementById('chrono-sel');
+  var labels = {mat:'Pico 5–10 AM 🌅', int:'Pico 9 AM–1 PM ☀️', noc:'Pico 5–10 PM 🌙'};
+  if (state.cronotipo) {
+    el.textContent = labels[state.cronotipo] || '— Configurar';
+    if (sel) sel.value = state.cronotipo;
+  }
+}
+updateChronoDisplay();
+
+function saveChrono() {
+  var sel = document.getElementById('chrono-sel');
+  state.cronotipo = sel.value;
+  save();
+  updateChronoDisplay();
+}
+
+// ── PWA ──
+var deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('install-banner').style.display = 'flex';
+});
+function installPWA() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(function(){ deferredPrompt = null; document.getElementById('install-banner').style.display = 'none'; });
+  }
+}
+
+// ── Tabs ──
+function showTab(id, btn) {
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+  document.querySelectorAll('.nav-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.getElementById('tab-'+id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (id === 'semana') { renderWeek(); loadDiagnostico(); renderDiagHistory(); renderArchivedMonths(); }
+  if (id === 'datos') updateDataInfo();
+}
+
+// ── Modo Mantenimiento ──
+function enableMantMode() {
+  state.mantMode = true;
+  document.getElementById('mant-banner').classList.add('visible');
+  // Hide tad rows 1 and 2
+  document.getElementById('tad-row-1').style.display = 'none';
+  document.getElementById('tad-row-2').style.display = 'none';
+  save();
+}
+function disableMantMode() {
+  state.mantMode = false;
+  document.getElementById('mant-banner').classList.remove('visible');
+  document.getElementById('tad-row-1').style.display = '';
+  document.getElementById('tad-row-2').style.display = '';
+  save();
+}
+if (state.mantMode) {
+  document.getElementById('mant-banner').classList.add('visible');
+  document.getElementById('tad-row-1').style.display = 'none';
+  document.getElementById('tad-row-2').style.display = 'none';
+}
+
+// ── Motivational Status ──
+function updateMotivationalStatus(pct) {
+  if (timerRunning) return;
+  var el = document.getElementById('timer-status');
+  if (!el) return;
+  if (pct === 100) { el.textContent = 'Sistema calibrado. Córtex en máxima eficiencia. ✦'; el.style.color = 'var(--cyan)'; }
+  else if (pct >= 66) { el.textContent = 'Buen ritmo. Una TAD más y el día está ganado.'; el.style.color = 'var(--text-muted)'; }
+  else if (pct > 0) { el.textContent = 'El foco profundo cambia todo. Activa el temporizador.'; el.style.color = 'var(--text-dim)'; }
+  else { el.textContent = 'Tu mente no necesita más motivación. Necesita menos fricción.'; el.style.color = 'var(--text-muted)'; }
+}
+
+// ── TADs ──
+function renderTads() {
+  for (var i=0; i<3; i++) {
+    var c = document.getElementById('c'+i);
+    var inp = document.getElementById('t'+i);
+    c.className = 'tad-check' + (state.tads[i] ? ' done' : '');
+    inp.className = 'tad-input' + (state.tads[i] ? ' done' : '');
+    if (inp.value === '' && state.tadText[i]) inp.value = state.tadText[i];
+  }
+  var activeTads = state.mantMode ? 1 : 3;
+  var done = 0;
+  for (var i=0; i<activeTads; i++) { if (state.tads[i]) done++; }
+  var pct = Math.round(done/activeTads*100);
+  document.getElementById('prog').style.width = pct+'%';
+  document.getElementById('pct-val').textContent = pct+'%';
+  updateMotivationalStatus(pct);
+  checkAlert();
+  // Show share button if 100%
+  if (pct === 100) showShareTrigger(); else hideShareTrigger();
+}
+
+function showShareTrigger() {
+  if (!document.getElementById('share-trigger')) {
+    var btn = document.createElement('button');
+    btn.id = 'share-trigger';
+    btn.className = 'btn primary full';
+    btn.style.marginTop = '10px';
+    btn.innerHTML = '✦ Compartir mi resultado de hoy';
+    btn.onclick = openShare;
+    document.getElementById('tab-foco').appendChild(btn);
+  }
+}
+function hideShareTrigger() {
+  var el = document.getElementById('share-trigger');
+  if (el) el.remove();
+}
+
+(function() {
+  for (var i=0; i<3; i++) {
+    (function(idx) {
+      document.getElementById('t'+idx).addEventListener('input', function() {
+        state.tadText[idx] = document.getElementById('t'+idx).value;
+        save();
+      });
+    })(i);
+  }
+})();
+
+function toggleTad(i) {
+  state.tads[i] = !state.tads[i];
+  renderTads();
+  save();
+  // Haptic feedback
+  if (navigator.vibrate) navigator.vibrate(40);
+}
+
+function checkAlert() {
+  var yesterday = new Date(today);
+  yesterday.setDate(today.getDate()-1);
+  var yEntry = null;
+  for (var i=0; i<state.weekData.length; i++) {
+    if (state.weekData[i].date === yesterday.toDateString()) { yEntry = state.weekData[i]; break; }
+  }
+  document.getElementById('alert-box').style.display = (yEntry && yEntry.pct === 0) ? 'flex' : 'none';
+}
+
+renderTads();
+
+// ── Focus Lock ──
+function lockFocusMode(lock) {
+  try {
+    document.querySelectorAll('.tad-input').forEach(function(inp){
+      inp.readOnly = lock; inp.style.opacity = lock ? '0.75' : '1'; inp.style.cursor = lock ? 'not-allowed' : '';
+    });
+    document.querySelectorAll('.tad-check').forEach(function(c){
+      c.style.pointerEvents = lock ? 'none' : ''; c.style.opacity = lock ? '0.75' : '1';
+    });
+    document.querySelectorAll('.nav-btn').forEach(function(b, i){
+      if (i > 0) { b.style.pointerEvents = lock ? 'none' : ''; b.style.opacity = lock ? '0.35' : '1'; }
+    });
+    document.getElementById('focus-lock-banner').style.display = lock ? 'flex' : 'none';
+  } catch(e) {}
+}
+
+// ── Focus Timer ──
+var timerSecs = 90*60;
+var timerRunning = false;
+var timerInterval = null;
+var timerStartedAt = null;
+
+function timerTick() {
+  if (timerSecs <= 0) {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    lockFocusMode(false);
+    // Save focus minutes
+    var elapsed = Math.round((90*60 - timerSecs) / 60);
+    state.focusMinutesTotal = (state.focusMinutesTotal || 0) + elapsed;
+    save();
+    var st = document.getElementById('timer-status');
+    st.textContent = 'Bloque completado. Activa el Valle ahora. ✦';
+    st.style.color = 'var(--cyan)';
+    document.getElementById('btn-start').style.display = 'flex';
+    document.getElementById('btn-pause').style.display = 'none';
+    document.getElementById('timer-num').classList.remove('running');
+    if (navigator.vibrate) navigator.vibrate([100,50,100]);
+    return;
+  }
+  timerSecs--;
+  var m = Math.floor(timerSecs/60), s = timerSecs%60;
+  document.getElementById('timer-num').textContent = (m<10?'0'+m:m)+':'+(s<10?'0'+s:s);
+  document.getElementById('timer-status').textContent = 'en curso — ' + Math.floor((90*60-timerSecs)/60) + ' min completados';
+  document.getElementById('timer-status').style.color = 'var(--text-dim)';
+}
+
+function timerAction(a) {
+  if (a === 'start') {
+    if (timerRunning) return;
+    timerRunning = true;
+    lockFocusMode(true);
+    document.getElementById('btn-start').style.display = 'none';
+    document.getElementById('btn-pause').style.display = 'flex';
+    document.getElementById('timer-num').classList.add('running');
+    timerInterval = setInterval(timerTick, 1000);
+  } else if (a === 'pause') {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    var elapsed = Math.round((90*60 - timerSecs) / 60);
+    state.focusMinutesTotal = (state.focusMinutesTotal || 0) + elapsed;
+    save();
+    lockFocusMode(false);
+    document.getElementById('btn-start').style.display = 'flex';
+    document.getElementById('btn-pause').style.display = 'none';
+    document.getElementById('timer-status').textContent = 'En pausa. El foco vuelve cuando tú decides.';
+    document.getElementById('timer-status').style.color = 'var(--text-dim)';
+    document.getElementById('timer-num').classList.remove('running');
+  } else {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    timerSecs = 90*60;
+    lockFocusMode(false);
+    document.getElementById('timer-num').textContent = '90:00';
+    document.getElementById('btn-start').style.display = 'flex';
+    document.getElementById('btn-pause').style.display = 'none';
+    document.getElementById('timer-num').classList.remove('running');
+    var done2=0; for(var i=0;i<3;i++){if(state.tads[i])done2++;}
+    updateMotivationalStatus(Math.round(done2/3*100));
+  }
+}
+
+// ── Valle Timer ──
+var vSecs=15*60, vRunning=false, vInterval=null;
+function vTimerTick() {
+  if (vSecs<=0) {
+    clearInterval(vInterval); vRunning=false;
+    document.getElementById('v-timer-status').textContent = 'Valle completado 🌳';
+    document.getElementById('vbtn-start').style.display='flex';
+    document.getElementById('vbtn-pause').style.display='none';
+    document.getElementById('v-timer-num').classList.remove('running');
+    if (navigator.vibrate) navigator.vibrate([100,50,100]);
+    return;
+  }
+  vSecs--;
+  var m=Math.floor(vSecs/60),s=vSecs%60;
+  document.getElementById('v-timer-num').textContent=(m<10?'0'+m:m)+':'+(s<10?'0'+s:s);
+  document.getElementById('v-timer-status').textContent='recuperando sistema nervioso...';
+}
+function vTimerAction(a) {
+  if (a==='start') {
+    if (vRunning) return; vRunning=true;
+    document.getElementById('vbtn-start').style.display='none';
+    document.getElementById('vbtn-pause').style.display='flex';
+    document.getElementById('v-timer-num').classList.add('running');
+    vInterval=setInterval(vTimerTick,1000);
+  } else if (a==='pause') {
+    clearInterval(vInterval); vRunning=false;
+    document.getElementById('vbtn-start').style.display='flex';
+    document.getElementById('vbtn-pause').style.display='none';
+    document.getElementById('v-timer-status').textContent='pausado';
+    document.getElementById('v-timer-num').classList.remove('running');
+  } else {
+    clearInterval(vInterval); vRunning=false; vSecs=15*60;
+    document.getElementById('v-timer-num').textContent='15:00';
+    document.getElementById('v-timer-status').textContent='listo para iniciar';
+    document.getElementById('vbtn-start').style.display='flex';
+    document.getElementById('vbtn-pause').style.display='none';
+    document.getElementById('v-timer-num').classList.remove('running');
+  }
+}
+
+// ── Valle ──
+function saveValle() { state.valleType = document.getElementById('valle-sel').value; save(); }
+if (state.valleType) document.getElementById('valle-sel').value = state.valleType;
+
+// ── Cierre PM ──
+function doneStep(n) {
+  state.cierreSteps[n-1]=true;
+  var el=document.getElementById('s'+n);
+  el.classList.add('done'); el.textContent='✓';
+  save();
+}
+for (var _i=0;_i<3;_i++) {
+  if (state.cierreSteps[_i]) {
+    var _el=document.getElementById('s'+(_i+1));
+    _el.classList.add('done'); _el.textContent='✓';
+  }
+}
+if (state.mañanaTads) {
+  for (var _i=0;_i<3;_i++) {
+    var _mel=document.getElementById('m'+_i);
+    if (_mel && state.mañanaTads[_i]) _mel.value=state.mañanaTads[_i];
+  }
+}
+
+function closeDia() {
+  var activeTads = state.mantMode ? 1 : 3;
+  var done=0;
+  for (var i=0;i<activeTads;i++) { if(state.tads[i]) done++; }
+  var pct=Math.round(done/activeTads*100);
+  var entry={date:todayStr,day:today.getDay(),pct:pct,valleReal:state.valleType==='real',focusMin:state.focusMinutesTotal||0};
+  var wd=state.weekData||[];
+  var idx=-1;
+  for(var i=0;i<wd.length;i++){if(wd[i].date===todayStr){idx=i;break;}}
+  if(idx>-1) wd[idx]=entry; else wd.push(entry);
+  if(wd.length>90) wd.shift();
+  state.weekData=wd;
+  state.mañanaTads=[document.getElementById('m0').value,document.getElementById('m1').value,document.getElementById('m2').value];
+  state.cierreSteps[2]=true;
+  var s3=document.getElementById('s3');
+  s3.classList.add('done'); s3.textContent='✓';
+  document.getElementById('day-done').style.display='block';
+  save();
+}
+
+// ── Week Chart ──
+function renderWeek() {
+  var wd=state.weekData||[];
+  var barsEl=document.getElementById('week-bars');
+  var daysEl=document.getElementById('week-days');
+  barsEl.innerHTML=''; daysEl.innerHTML='';
+  var last30=[];
+  for(var i=29;i>=0;i--){var d=new Date(today);d.setDate(today.getDate()-i);last30.push(d);}
+  for(var i=0;i<last30.length;i++){
+    var d=last30[i];
+    var entry=null;
+    for(var j=0;j<wd.length;j++){if(wd[j].date===d.toDateString()){entry=wd[j];break;}}
+    var pct=entry?entry.pct:null;
+    var isToday=d.toDateString()===todayStr;
+    var hasRecord=entry!==null;
+    var col=document.createElement('div');
+    col.className='bar-col'+(isToday?' bar-today':'');
+    var fillH=(pct!==null&&pct>0)?pct:0;
+    var fillClass=(!hasRecord||pct===0)?'bar-fg zero':'bar-fg';
+    var opacity=!hasRecord?'0.40':'1';
+    col.innerHTML='<div class="bar-bg"><div class="'+fillClass+'" style="height:'+fillH+'%;opacity:'+opacity+'"></div></div>';
+    barsEl.appendChild(col);
+    var dayEl=document.createElement('div');
+    dayEl.className='bar-day';
+    dayEl.style.flex='1';
+    dayEl.style.textAlign='center';
+    if(isToday){dayEl.style.color='var(--cyan)';dayEl.textContent=DAYS_ES[d.getDay()];}
+    else if(i%5===0){dayEl.style.color='var(--text-dim)';dayEl.textContent=d.getDate();}
+    else{dayEl.textContent='';}
+    if(!hasRecord) dayEl.style.opacity='0.60';
+    daysEl.appendChild(dayEl);
+  }
+  var withData=[];
+  for(var i=0;i<wd.length;i++){if(typeof wd[i].pct==='number')withData.push(wd[i]);}
+  var avg=withData.length?Math.round(withData.reduce(function(a,b){return a+b.pct;},0)/withData.length):null;
+  var streak=0;
+  for(var i=0;i<wd.length;i++){if(wd[i].pct>0)streak++;}
+  var valles=0;
+  for(var i=0;i<wd.length;i++){if(wd[i].valleReal)valles++;}
+  document.getElementById('s-avg').textContent=avg!==null?avg+'%':'—';
+  document.getElementById('s-streak').textContent=withData.length?streak:'—';
+  document.getElementById('s-valles').textContent=withData.length?valles:'—';
+}
+
+// ── SHARE CARD ──
+function openShare() {
+  var wd=state.weekData||[];
+  var done=0; for(var i=0;i<3;i++){if(state.tads[i])done++;}
+  var pct=Math.round(done/3*100);
+
+  // Date
+  document.getElementById('sc-date').textContent = DAYS_ES[today.getDay()].toUpperCase()+' '+today.getDate()+' '+MONTHS_ES[today.getMonth()].toUpperCase().substr(0,3);
+
+  // Pct
+  document.getElementById('sc-pct').textContent = pct+'%';
+  document.getElementById('sc-pct-label').textContent = pct===100?'DÍA GANADO ✦':'TASA DE EJECUCIÓN';
+  document.getElementById('sc-pct').style.color = pct===100?'var(--cyan)':pct>=66?'var(--text)':'var(--orange)';
+
+  // Metrics
+  document.getElementById('sc-focus').textContent = (state.focusMinutesTotal||0)>0?(state.focusMinutesTotal||0)+'m':'—';
+  // Streak
+  var streak=0;
+  for(var i=wd.length-1;i>=0;i--){if(wd[i].pct>0)streak++;else break;}
+  document.getElementById('sc-streak-num').textContent = streak||'1';
+  document.getElementById('sc-valle').textContent = state.valleType==='real'?'🌳 Sí':'📱 No';
+
+  // Streak dots (last 7 days)
+  var bar=document.getElementById('sc-streak-bar');
+  bar.innerHTML='';
+  for(var i=6;i>=0;i--){
+    var d=new Date(today); d.setDate(today.getDate()-i);
+    var entry=null;
+    for(var j=0;j<wd.length;j++){if(wd[j].date===d.toDateString()){entry=wd[j];break;}}
+    var dot=document.createElement('div');
+    dot.className='share-streak-dot'+(i===0?' today':entry&&entry.pct>0?' filled':'');
+    bar.appendChild(dot);
+  }
+
+  // TADs
+  var tadsEl=document.getElementById('sc-tads');
+  tadsEl.innerHTML='';
+  for(var i=0;i<3;i++){
+    var txt=state.tadText[i];
+    if(!txt) continue;
+    var row=document.createElement('div');
+    row.className='share-tad';
+    var dot=document.createElement('div');
+    dot.className='share-tad-dot'+(state.tads[i]?'':' empty');
+    var span=document.createElement('span');
+    span.className='share-tad-text'+(state.tads[i]?' done-text':'');
+    span.textContent=(state.tads[i]?'✓ ':'○ ')+txt;
+    row.appendChild(dot); row.appendChild(span);
+    tadsEl.appendChild(row);
+  }
+
+  // Day number
+  var dayNum=wd.length+1;
+  document.getElementById('sc-day-num').textContent=dayNum;
+
+  document.getElementById('share-overlay').classList.add('visible');
+}
+
+function closeShare() {
+  document.getElementById('share-overlay').classList.remove('visible');
+}
+
+function downloadCard() {
+  // Simple: open print dialog / tell user to screenshot
+  // For full canvas export would need html2canvas (external lib)
+  alert('📸 Toma una captura de pantalla del card para compartirlo en tus redes.\n\nConsejo: presiona el botón de volumen + encendido en iPhone, o el botón de encendido + bajar volumen en Android.');
+}
+
+// ── Backup ──
+function showMsg(text, type) {
+  var el=document.getElementById('backup-msg');
+  el.textContent=text; el.className='backup-msg '+type; el.style.display='block';
+  setTimeout(function(){el.style.display='none';},4000);
+}
+
+function exportData() {
+  try {
+    var raw=localStorage.getItem(STORAGE_KEY)||'{}';
+    var payload={version:'2.0',exportDate:new Date().toISOString(),product:'NEUROSYSTEM — Radiografía Mental',data:JSON.parse(raw)};
+    var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/octet-stream'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url; a.download='neurosystem-backup-'+new Date().toISOString().split('T')[0]+'.nsbackup';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showMsg('✓ Backup exportado correctamente.','ok');
+  } catch(e){showMsg('Error al exportar. Intenta de nuevo.','err');}
+}
+
+function importData(event) {
+  var file=event.target.files[0]; if(!file) return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try {
+      var payload=JSON.parse(e.target.result);
+      if(!payload.data) throw new Error();
+      localStorage.setItem(STORAGE_KEY,JSON.stringify(payload.data));
+      loadState(); renderTads();
+      showMsg('✓ Datos restaurados correctamente.','ok');
+    } catch(err){showMsg('Archivo inválido. Solo archivos .nsbackup de NEUROSYSTEM.','err');}
+  };
+  reader.readAsText(file);
+  event.target.value='';
+}
+
+function updateDataInfo() {
+  try {
+    var raw=localStorage.getItem(STORAGE_KEY)||'';
+    var kb=(new Blob([raw]).size/1024).toFixed(1);
+    var el1=document.getElementById('data-size');
+    var el2=document.getElementById('data-days');
+    if(el1) el1.textContent=kb+' KB';
+    if(el2) el2.textContent=(state.weekData?state.weekData.length:0)+' días registrados';
+  } catch(e){}
+}
+
+function confirmReset() {
+  if(confirm('¿Seguro que quieres borrar TODOS los datos? Esta acción no se puede deshacer.')) {
+    localStorage.removeItem(STORAGE_KEY); location.reload();
+  }
+}
+
+// ── Diagnóstico ──
+function getWeekKey() {
+  var d=new Date(today); d.setHours(0,0,0,0); d.setDate(d.getDate()+4-(d.getDay()||7));
+  var ys=new Date(d.getFullYear(),0,1);
+  var wn=Math.ceil((((d-ys)/86400000)+1)/7);
+  return d.getFullYear()+'-W'+(wn<10?'0'+wn:wn);
+}
+
+function loadDiagnostico() {
+  var wk=getWeekKey();
+  var diagData=state.diagnosticos||{};
+  var current=diagData[wk]||{};
+  document.getElementById('diag-1').value=current.d1||'';
+  document.getElementById('diag-2').value=current.d2||'';
+  document.getElementById('diag-3').value=current.d3||'';
+  document.getElementById('diag-4').value=current.d4||'';
+}
+
+function saveDiagnostico() {
+  var wk=getWeekKey();
+  if(!state.diagnosticos) state.diagnosticos={};
+  var wd=state.weekData||[];
+  var weekEntries=[];
+  for(var i=6;i>=0;i--){
+    var d=new Date(today); d.setDate(today.getDate()-i);
+    for(var j=0;j<wd.length;j++){if(wd[j].date===d.toDateString()){weekEntries.push(wd[j]);break;}}
+  }
+  var avgPct=weekEntries.length?Math.round(weekEntries.reduce(function(a,b){return a+b.pct;},0)/weekEntries.length):0;
+  var vallesReales=weekEntries.filter(function(e){return e.valleReal;}).length;
+  var diasActivos=weekEntries.filter(function(e){return e.pct>0;}).length;
+  state.diagnosticos[wk]={weekKey:wk,savedAt:new Date().toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'}),d1:document.getElementById('diag-1').value,d2:document.getElementById('diag-2').value,d3:document.getElementById('diag-3').value,d4:document.getElementById('diag-4').value,avgPct:avgPct,diasActivos:diasActivos,vallesReales:vallesReales};
+  save();
+  var msg=document.getElementById('diag-saved-msg');
+  msg.style.display='block';
+  setTimeout(function(){msg.style.display='none';},3000);
+  renderDiagHistory();
+}
+
+function renderDiagHistory() {
+  var diagData=state.diagnosticos||{};
+  var keys=Object.keys(diagData).sort().reverse();
+  var container=document.getElementById('diag-history-list');
+  if(!container) return;
+  container.innerHTML='';
+  if(keys.length===0){container.innerHTML='<div style="font-size:12px;color:var(--text-dim);text-align:center;padding:12px">Aún no hay diagnósticos guardados.</div>';return;}
+  for(var i=0;i<keys.length;i++){
+    var k=keys[i],d=diagData[k];
+    var card=document.createElement('div');
+    card.className='history-week';
+    var trendIcon='';
+    if(i<keys.length-1){var prev=diagData[keys[i+1]];trendIcon=d.avgPct>prev.avgPct?' ↑':d.avgPct<prev.avgPct?' ↓':' →';}
+    card.innerHTML='<div class="history-week-header" onclick="toggleHistory(this)"><span class="history-week-title">'+d.savedAt+'</span><span class="history-week-badge">'+d.avgPct+'%'+trendIcon+'</span></div><div class="history-week-body"><div class="history-diag-item"><div class="history-diag-q">CONSISTENCIA</div><div class="history-diag-a">'+(d.d1||'—')+'</div></div><div class="history-diag-item"><div class="history-diag-q">PATRÓN DE DÍAS MALOS</div><div class="history-diag-a">'+(d.d2||'—')+'</div></div><div class="history-diag-item"><div class="history-diag-q">CALIBRACIÓN</div><div class="history-diag-a">'+(d.d3||'—')+'</div></div><div class="history-diag-item"><div class="history-diag-q">VALLE REAL VS. FALSO</div><div class="history-diag-a">'+(d.d4||'—')+'</div></div><div style="display:flex;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)"><span style="font-size:10px;color:var(--text-dim);font-family:var(--font-mono)">📊 '+d.avgPct+'%</span><span style="font-size:10px;color:var(--text-dim);font-family:var(--font-mono)">⚡ '+d.diasActivos+' días</span><span style="font-size:10px;color:var(--text-dim);font-family:var(--font-mono)">🌳 '+d.vallesReales+' valles</span></div></div>';
+    container.appendChild(card);
+  }
+  if(keys.length>=4) renderMonthlySummary(diagData,keys);
+}
+
+function toggleHistory(h){h.nextElementSibling.classList.toggle('open');}
+
+function renderMonthlySummary(diagData,keys){
+  var section=document.getElementById('monthly-summary-section');
+  var card=document.getElementById('monthly-summary-card');
+  if(!section||!card) return;
+  section.style.display='block';
+  var last4=keys.slice(0,4).reverse();
+  var weeks=last4.map(function(k){return diagData[k];});
+  var gridHtml='<div class="monthly-compare">';
+  for(var i=0;i<weeks.length;i++){
+    var w=weeks[i];
+    var color=w.avgPct>=80?'var(--cyan)':w.avgPct>=50?'var(--text-muted)':'var(--orange)';
+    gridHtml+='<div class="monthly-cell"><div class="monthly-cell-week">SEMANA '+(i+1)+'</div><div class="monthly-cell-val" style="color:'+color+'">'+w.avgPct+'%</div><div class="monthly-cell-lbl">'+w.diasActivos+' act · '+w.vallesReales+' 🌳</div></div>';
+  }
+  gridHtml+='</div>';
+  var avgs=weeks.map(function(w){return w.avgPct;});
+  var trend=avgs[3]-avgs[0];
+  var improving=avgs[1]>=avgs[0]&&avgs[2]>=avgs[1]&&avgs[3]>=avgs[2];
+  var declining=avgs[1]<=avgs[0]&&avgs[2]<=avgs[1]&&avgs[3]<=avgs[2];
+  var totalValles=weeks.reduce(function(a,w){return a+w.vallesReales;},0);
+  var totalActivos=weeks.reduce(function(a,w){return a+w.diasActivos;},0);
+  var globalAvg=Math.round(avgs.reduce(function(a,b){return a+b;},0)/4);
+  var insight='';
+  if(improving) insight='📈 <b>Tendencia positiva.</b> Tu consistencia mejoró las 4 semanas consecutivas.';
+  else if(declining) insight='📉 <b>Tendencia a revisar.</b> La consistencia bajó semana a semana. Revisa el tamaño de tus TADs.';
+  else if(trend>10) insight='📈 <b>Progreso neto positivo.</b> El mes cerró mejor de lo que empezó.';
+  else if(trend<-10) insight='⚠️ <b>Mes con caída neta.</b> Identifica qué cambió y corrígelo.';
+  else insight='➡️ <b>Mes estable.</b> Evalúa si las TADs necesitan ser más desafiantes.';
+  insight+=' <b>'+totalActivos+' días activos</b> · <b>'+totalValles+' valles reales</b>. Promedio: <b>'+globalAvg+'%</b>.';
+  card.innerHTML=gridHtml+'<div class="monthly-insight">'+insight+'</div>';
+  card.setAttribute('data-weeks',JSON.stringify(last4));
+  card.setAttribute('data-insight',insight);
+  card.setAttribute('data-avg',globalAvg);
+}
+
+function closeMes(){
+  if(!confirm('¿Cerrar este mes y comenzar un nuevo ciclo?')) return;
+  var diagData=state.diagnosticos||{};
+  var keys=Object.keys(diagData).sort().reverse();
+  var last4=keys.slice(0,4);
+  var card=document.getElementById('monthly-summary-card');
+  var insight=card?card.getAttribute('data-insight'):'';
+  var globalAvg=card?card.getAttribute('data-avg'):'0';
+  if(!state.mesesCerrados) state.mesesCerrados=[];
+  var mesLabel=new Date().toLocaleDateString('es-MX',{month:'long',year:'numeric'});
+  state.mesesCerrados.unshift({label:mesLabel,closedAt:new Date().toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'}),weekKeys:last4,globalAvg:parseInt(globalAvg),insight:insight,weeks:last4.map(function(k){return diagData[k];})});
+  for(var i=0;i<last4.length;i++){delete state.diagnosticos[last4[i]];}
+  document.getElementById('monthly-summary-section').style.display='none';
+  save(); renderDiagHistory(); renderArchivedMonths();
+}
+
+function renderArchivedMonths(){
+  var months=state.mesesCerrados||[];
+  var section=document.getElementById('archived-months-section');
+  var list=document.getElementById('archived-months-list');
+  if(!section||!list) return;
+  if(months.length===0){section.style.display='none';return;}
+  section.style.display='block'; list.innerHTML='';
+  for(var i=0;i<months.length;i++){
+    var m=months[i];
+    var card=document.createElement('div');
+    card.className='archived-month';
+    var weeksHtml='';
+    if(m.weeks){
+      weeksHtml='<div class="monthly-compare" style="margin-bottom:10px">';
+      for(var j=0;j<m.weeks.length;j++){
+        var w=m.weeks[j];
+        var color=w.avgPct>=80?'var(--cyan)':w.avgPct>=50?'var(--text-muted)':'var(--orange)';
+        weeksHtml+='<div class="monthly-cell"><div class="monthly-cell-week">SEM '+(j+1)+'</div><div class="monthly-cell-val" style="color:'+color+'">'+w.avgPct+'%</div><div class="monthly-cell-lbl">'+w.diasActivos+' act · '+w.vallesReales+' 🌳</div></div>';
+      }
+      weeksHtml+='</div>';
+    }
+    card.innerHTML='<div class="archived-month-header" onclick="toggleArchivedMonth(this)"><span class="archived-month-title">📁 '+m.label+'</span><span class="archived-month-badge">'+m.globalAvg+'% promedio</span></div><div class="archived-month-body">'+weeksHtml+'<div class="monthly-insight">'+(m.insight||'')+'</div></div>';
+    list.appendChild(card);
+  }
+}
+
+function toggleArchivedMonth(h){h.nextElementSibling.classList.toggle('open');}
+
+// Auto-save diag text
+(function(){
+  ['diag-1','diag-2','diag-3','diag-4'].forEach(function(fid,idx){
+    var el=document.getElementById(fid);
+    if(el){el.addEventListener('input',function(){
+      var wk=getWeekKey();
+      if(!state.diagnosticos) state.diagnosticos={};
+      if(!state.diagnosticos[wk]) state.diagnosticos[wk]={};
+      state.diagnosticos[wk]['d'+(idx+1)]=el.value;
+    });}
+  });
+})();
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});
+}
+</script>
+</body>
+</html>
