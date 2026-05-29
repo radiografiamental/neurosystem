@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#00e5b0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="NEUROSYSTEM">
+<title>NEUROSYSTEM — Radiografía Mental</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0a0a;--surface:#111111;--surface2:#1a1a1a;--border:rgba(255,255,255,0.08);
+  --cyan:#00e5b0;--cyan-dim:rgba(0,229,176,0.10);--cyan-mid:rgba(0,229,176,0.22);
+  --orange:#ff6b35;--orange-dim:rgba(255,107,53,0.10);
+  --text:#f0f0f0;--text-muted:#b3b3b3;--text-dim:#8e8e93;
+  --radius:10px;--radius-sm:6px;
+  --font-d:'Syne',sans-serif;--font-m:'DM Mono',monospace;
+  --sb:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html{background:var(--bg);color:var(--text);font-family:var(--font-d);min-height:100%;}
+body{max-width:480px;margin:0 auto;padding-bottom:calc(5rem + var(--sb));min-height:100vh;overflow-x:hidden;}
+
+/* ── SPLASH ── */
+#splash{position:fixed;inset:0;background:var(--bg);z-index:2000;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .5s;}
+#splash.hide{opacity:0;pointer-events:none;}
+.splash-logo{width:70px;height:70px;border-radius:50%;overflow:hidden;border:2px solid rgba(0,229,176,0.4);margin-bottom:16px;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,229,176,0.3);}50%{box-shadow:0 0 0 12px rgba(0,229,176,0);}}
+.splash-name{font-size:26px;font-weight:700;letter-spacing:0.08em;color:var(--text);}
+.splash-name span{color:var(--cyan);}
+.splash-sub{font-family:var(--font-m);font-size:10px;color:var(--text-dim);letter-spacing:0.15em;margin-top:6px;text-transform:uppercase;}
+.splash-bar{width:120px;height:2px;background:var(--surface2);border-radius:1px;margin-top:32px;overflow:hidden;}
+.splash-bar-fill{height:100%;background:var(--cyan);border-radius:1px;animation:load 1.4s ease forwards;}
+@keyframes load{from{width:0%;}to{width:100%;}}
+
+/* ── ONBOARDING ── */
+#onboarding{position:fixed;inset:0;background:var(--bg);z-index:1000;display:none;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1.5rem;max-width:480px;margin:0 auto;}
+@keyframes slideIn{from{opacity:0;transform:translateX(24px);}to{opacity:1;transform:translateX(0);}}
+.ob-step{width:100%;animation:slideIn .3s ease;}
+.ob-logo{text-align:center;margin-bottom:1.75rem;}
+.ob-logo-img{width:52px;height:52px;border-radius:50%;border:2px solid rgba(0,229,176,0.4);overflow:hidden;margin:0 auto 10px;}
+.ob-logo-img img{width:100%;height:100%;object-fit:cover;}
+.ob-channel{font-family:var(--font-m);font-size:10px;color:var(--cyan);letter-spacing:0.12em;text-transform:uppercase;}
+.ob-brand{font-size:20px;font-weight:700;letter-spacing:0.08em;color:var(--text);}
+.ob-brand span{color:var(--cyan);}
+.ob-dots{display:flex;gap:6px;justify-content:center;margin-bottom:1.75rem;}
+.ob-dot{width:6px;height:6px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);transition:all .3s;}
+.ob-dot.active{background:var(--cyan);border-color:var(--cyan);width:20px;border-radius:3px;}
+.ob-dot.done{background:rgba(0,229,176,0.4);border-color:rgba(0,229,176,0.4);}
+.ob-title{font-size:20px;font-weight:700;color:var(--text);margin-bottom:8px;line-height:1.3;}
+.ob-title span{color:var(--cyan);}
+.ob-desc{font-size:13px;color:var(--text-muted);line-height:1.7;margin-bottom:1.5rem;}
+.ob-sci{background:var(--cyan-dim);border:1px solid rgba(0,229,176,0.2);border-radius:var(--radius);padding:12px 14px;margin-bottom:1.5rem;}
+.ob-sci-lbl{font-family:var(--font-m);font-size:9px;color:var(--cyan);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:4px;}
+.ob-sci-txt{font-size:12px;color:rgba(0,229,176,0.8);line-height:1.6;}
+.ob-opts{display:flex;flex-direction:column;gap:10px;margin-bottom:1.5rem;}
+.ob-opt{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:13px 16px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:14px;}
+.ob-opt.sel{border-color:var(--cyan);background:var(--cyan-dim);}
+.ob-opt-icon{font-size:22px;flex-shrink:0;}
+.ob-opt-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px;}
+.ob-opt-desc{font-size:11px;color:var(--text-dim);}
+.ob-tads{display:flex;flex-direction:column;gap:10px;margin-bottom:1.5rem;}
+.ob-tad-row{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;}
+.ob-tad-num{font-family:var(--font-m);font-size:11px;color:var(--cyan);flex-shrink:0;width:20px;}
+.ob-tad-inp{flex:1;background:none;border:none;outline:none;font-family:var(--font-d);font-size:13px;color:var(--text);}
+.ob-tad-inp::placeholder{color:var(--text-dim);}
+.ob-btn{width:100%;padding:14px;background:var(--cyan);border:none;border-radius:var(--radius);font-family:var(--font-d);font-size:14px;font-weight:700;color:#000;cursor:pointer;letter-spacing:0.04em;transition:opacity .15s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.ob-btn:active{opacity:0.8;}
+.ob-btn.sec{background:none;border:1.5px solid var(--cyan);color:var(--cyan);}
+.ob-skip{text-align:center;margin-top:14px;font-size:12px;color:var(--text-dim);cursor:pointer;text-decoration:underline;}
+.ob-chrono-badge{display:inline-block;background:var(--cyan-dim);border:1px solid rgba(0,229,176,0.3);border-radius:20px;padding:6px 16px;font-family:var(--font-m);font-size:11px;color:var(--cyan);margin-bottom:1.75rem;}
+.ob-energy-slider{width:100%;height:6px;-webkit-appearance:none;appearance:none;background:var(--surface2);border-radius:3px;outline:none;margin:12px 0 20px;}
+.ob-energy-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:20px;height:20px;border-radius:50%;background:var(--cyan);cursor:pointer;}
+.ob-energy-labels{display:flex;justify-content:space-between;font-family:var(--font-m);font-size:10px;color:var(--text-dim);margin-top:-16px;margin-bottom:20px;}
+
+/* ── MORNING CHECK ── */
+#morning-check{position:fixed;inset:0;background:var(--bg);z-index:900;display:none;flex-direction:column;padding:2rem 1.5rem;max-width:480px;margin:0 auto;overflow-y:auto;}
+.mc-header{text-align:center;margin-bottom:2rem;padding-top:1rem;}
+.mc-greeting{font-size:22px;font-weight:700;color:var(--cyan);margin-bottom:6px;}
+.mc-date{font-family:var(--font-m);font-size:11px;color:var(--text-dim);}
+.mc-section{margin-bottom:1.5rem;}
+.mc-label{font-family:var(--font-m);font-size:10px;color:var(--text-dim);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:10px;}
+.mc-tad-prev{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:6px;display:flex;align-items:center;gap:10px;}
+.mc-tad-text{font-size:13px;color:var(--text-muted);}
+.energy-display{text-align:center;margin:8px 0;}
+.energy-num{font-family:var(--font-m);font-size:36px;color:var(--cyan);}
+.energy-label{font-size:12px;color:var(--text-dim);margin-top:4px;}
+
+/* ── HEADER ── */
+.header{padding:0.9rem 1.25rem 0.85rem;position:sticky;top:0;background:var(--bg);z-index:10;border-bottom:1px solid var(--border);}
+.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand-logo{width:34px;height:34px;border-radius:50%;overflow:hidden;flex-shrink:0;border:1.5px solid rgba(0,229,176,0.3);}
+.brand-logo img{width:100%;height:100%;object-fit:cover;}
+.brand-text{display:flex;flex-direction:column;line-height:1.2;}
+.brand-ch{font-size:9px;font-family:var(--font-m);color:var(--cyan);letter-spacing:0.1em;text-transform:uppercase;}
+.brand-name{font-size:15px;font-weight:700;letter-spacing:0.08em;color:var(--text);}
+.brand-name span{color:var(--cyan);}
+.date-pill{font-family:var(--font-m);font-size:10px;color:var(--text-muted);background:var(--surface2);border:1px solid var(--border);padding:3px 9px;border-radius:20px;}
+
+/* ── DAILY STATUS WIDGET ── */
+.daily-widget{display:flex;gap:8px;padding:0 1.25rem 0.85rem;overflow-x:auto;scrollbar-width:none;}
+.daily-widget::-webkit-scrollbar{display:none;}
+.dw-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 12px;display:flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0;transition:border-color .2s;}
+.dw-item.done{border-color:rgba(0,229,176,0.4);}
+.dw-dot{width:6px;height:6px;border-radius:50%;background:var(--text-dim);flex-shrink:0;}
+.dw-dot.done{background:var(--cyan);}
+.dw-label{font-family:var(--font-m);font-size:10px;color:var(--text-dim);}
+.dw-val{font-family:var(--font-m);font-size:10px;color:var(--text-muted);}
+
+/* ── NAV ── */
+.nav{display:flex;overflow-x:auto;padding:0 1.25rem;border-bottom:1px solid var(--border);scrollbar-width:none;}
+.nav::-webkit-scrollbar{display:none;}
+.nav-btn{font-family:var(--font-d);font-size:11px;font-weight:500;color:var(--text-dim);background:none;border:none;padding:10px 13px;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;transition:color .2s,border-color .2s;letter-spacing:0.05em;}
+.nav-btn.active{color:var(--cyan);border-bottom-color:var(--cyan);}
+
+/* ── TABS ── */
+.content{padding:1.25rem;}
+.tab{display:none;}
+.tab.active{display:block;}
+
+/* ── ALERTS / BANNERS ── */
+.alert{background:var(--orange-dim);border:1px solid var(--orange);border-radius:var(--radius);padding:12px 14px;font-size:12px;color:var(--orange);margin-bottom:1.25rem;display:flex;align-items:flex-start;gap:10px;line-height:1.5;}
+.banner-cyan{background:var(--cyan-dim);border:1px solid rgba(0,229,176,0.25);border-radius:var(--radius);padding:11px 14px;margin-bottom:1.25rem;display:flex;align-items:center;gap:12px;}
+.banner-cyan-text{flex:1;font-size:12px;color:var(--cyan);line-height:1.5;}
+.banner-cyan-text strong{display:block;margin-bottom:1px;font-size:13px;}
+
+/* ── SECTION LABEL ── */
+.sl{font-family:var(--font-m);font-size:10px;color:var(--text-dim);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:10px;margin-top:1.4rem;}
+.sl:first-child{margin-top:0;}
+
+/* ── CARD ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.card+.card{margin-top:10px;}
+
+/* ── TAD ── */
+.tad-row{display:flex;align-items:center;gap:12px;padding:13px 14px;border-bottom:1px solid var(--border);transition:opacity .2s;}
+.tad-row:last-of-type{border-bottom:none;}
+.tad-check{width:20px;height:20px;border:1.5px solid var(--text-dim);border-radius:4px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background .15s,border-color .15s;}
+.tad-check.done{background:var(--cyan);border-color:var(--cyan);}
+.tad-check.done::after{content:'✓';font-size:12px;color:#000;font-weight:700;}
+.tad-inp{flex:1;background:none;border:none;outline:none;font-family:var(--font-d);font-size:13px;color:var(--text);line-height:1.4;}
+.tad-inp::placeholder{color:var(--text-dim);}
+.tad-inp.done{text-decoration:line-through;color:var(--text-dim);}
+.tad-num{font-family:var(--font-m);font-size:10px;color:var(--text-dim);flex-shrink:0;}
+.tad-del{background:none;border:none;color:var(--text-dim);font-size:14px;cursor:pointer;padding:4px;flex-shrink:0;opacity:0.5;}
+.tad-del:active{opacity:1;}
+.progress-area{padding:12px 14px;border-top:1px solid var(--border);}
+.progress-track{height:4px;background:var(--surface2);border-radius:2px;overflow:hidden;}
+.progress-fill{height:100%;background:var(--cyan);border-radius:2px;transition:width .4s;}
+.progress-meta{display:flex;justify-content:space-between;margin-top:6px;}
+.progress-meta span{font-family:var(--font-m);font-size:11px;color:var(--text-muted);}
+.progress-meta strong{font-family:var(--font-m);font-size:11px;color:var(--cyan);}
+.tad-footer{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-top:1px solid var(--border);}
+.chrono-badge{font-family:var(--font-m);font-size:10px;color:var(--cyan);background:var(--cyan-dim);border:1px solid rgba(0,229,176,0.2);border-radius:20px;padding:3px 10px;}
+.add-tad-btn{font-family:var(--font-m);font-size:10px;color:var(--text-dim);background:none;border:none;cursor:pointer;letter-spacing:0.05em;}
+.add-tad-btn:hover{color:var(--cyan);}
+
+/* ── TIMER ── */
+.timer-display{text-align:center;padding:1.4rem 1rem 1rem;}
+.timer-num{font-family:var(--font-m);font-size:48px;color:var(--text);letter-spacing:0.04em;font-weight:500;transition:color .3s;}
+.timer-num.running{color:var(--cyan);}
+.timer-status{font-size:11px;color:var(--text-muted);margin-top:6px;text-align:center;line-height:1.6;padding:0 12px;}
+.timer-btns{display:flex;gap:8px;padding:0 14px 14px;}
+.timer-start-time{font-family:var(--font-m);font-size:10px;color:var(--text-dim);text-align:center;padding-bottom:8px;}
+
+/* ── BUTTONS ── */
+.btn{flex:1;padding:10px;border:1px solid var(--cyan);border-radius:var(--radius-sm);background:none;cursor:pointer;font-family:var(--font-d);font-size:12px;font-weight:500;color:var(--text);transition:background .15s;letter-spacing:0.04em;display:flex;align-items:center;justify-content:center;gap:6px;}
+.btn:active{opacity:0.75;}
+.btn.primary{background:var(--cyan-dim);border-color:var(--cyan);color:var(--cyan);}
+.btn.primary:hover{background:var(--cyan-mid);}
+.btn.full{flex:none;width:100%;}
+.btn.orange{border-color:var(--orange);color:var(--orange);background:var(--orange-dim);}
+.btn.sm{padding:7px 12px;font-size:11px;flex:none;width:auto;}
+.btn.ghost{border-color:var(--border);color:var(--text-dim);}
+
+/* ── PROTOCOL ── */
+.proto-item{display:flex;gap:12px;padding:13px 14px;border-bottom:1px solid var(--border);}
+.proto-item:last-child{border-bottom:none;}
+.proto-icon{font-size:18px;flex-shrink:0;width:28px;text-align:center;}
+.proto-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px;}
+.proto-desc{font-size:12px;color:var(--text-muted);line-height:1.5;}
+.proto-ref{font-size:10px;color:var(--text-dim);margin-top:3px;font-family:var(--font-m);}
+
+/* ── CIERRE ── */
+.cierre-step{display:flex;gap:12px;padding:14px;border-bottom:1px solid var(--border);}
+.cierre-step:last-child{border-bottom:none;}
+.step-circle{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--cyan);display:flex;align-items:center;justify-content:center;font-family:var(--font-m);font-size:11px;color:var(--text-muted);flex-shrink:0;transition:all .2s;}
+.step-circle.done{background:var(--cyan);border-color:var(--cyan);color:#000;font-weight:700;}
+.step-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px;}
+.step-desc{font-size:12px;color:var(--text-muted);margin-bottom:10px;line-height:1.5;}
+.ci-inp{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;font-family:var(--font-d);font-size:12px;color:var(--text);outline:none;margin-bottom:6px;transition:border-color .15s;}
+.ci-inp:focus{border-color:var(--cyan);}
+.ci-inp::placeholder{color:var(--text-dim);}
+.check-label{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-muted);margin-bottom:8px;cursor:pointer;}
+.check-label input{accent-color:var(--cyan);width:14px;height:14px;cursor:pointer;}
+.day-closed{background:var(--cyan-dim);border:1px solid rgba(0,229,176,0.3);border-radius:var(--radius);padding:1.5rem;text-align:center;margin-top:10px;}
+.day-closed-icon{font-size:28px;margin-bottom:8px;}
+.day-closed-title{font-size:15px;font-weight:500;color:var(--cyan);margin-bottom:4px;}
+.day-closed-sub{font-size:12px;color:rgba(0,229,176,0.5);}
+
+/* ── STATS ── */
+.stats-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px;text-align:center;}
+.stat-val{font-family:var(--font-m);font-size:22px;color:var(--cyan);font-weight:500;}
+.stat-lbl{font-size:10px;color:var(--text-dim);margin-top:3px;letter-spacing:0.04em;}
+
+/* ── CALENDAR GRID ── */
+.cal-wrap{padding:14px;}
+.cal-legend{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.cal-legend-title{font-family:var(--font-m);font-size:10px;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.cal-legend-dots{display:flex;align-items:center;gap:4px;}
+.cal-legend-dot{width:8px;height:8px;border-radius:2px;}
+.cal-day-labels{display:flex;gap:3px;margin-bottom:4px;padding-left:28px;}
+.cal-day-label{flex:1;text-align:center;font-family:var(--font-m);font-size:8px;color:var(--text-dim);}
+#cal-grid{display:flex;flex-direction:column;gap:3px;}
+.cal-row{display:flex;gap:3px;align-items:center;}
+.cal-row-label{width:24px;font-family:var(--font-m);font-size:8px;color:var(--text-dim);text-align:right;padding-right:4px;flex-shrink:0;}
+.cal-cell{flex:1;aspect-ratio:1;border-radius:2px;min-width:0;transition:transform .1s;}
+.cal-cell:active{transform:scale(0.9);}
+
+/* ── DIAGNOSTICO ── */
+.diag-q{margin-bottom:14px;}
+.diag-label{font-size:12px;font-weight:500;color:var(--text-muted);margin-bottom:6px;display:block;}
+textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;resize:none;font-family:var(--font-d);font-size:12px;color:var(--text);outline:none;line-height:1.5;transition:border-color .15s;}
+textarea:focus{border-color:var(--cyan);}
+textarea::placeholder{color:var(--text-dim);}
+
+/* ── AI COACH ── */
+.ai-box{background:var(--cyan-dim);border:1px solid rgba(0,229,176,0.25);border-radius:var(--radius);padding:14px;margin-bottom:14px;}
+.ai-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.ai-avatar{width:26px;height:26px;border-radius:50%;background:rgba(0,229,176,0.15);border:1px solid rgba(0,229,176,0.3);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.ai-label{font-family:var(--font-m);font-size:10px;color:var(--cyan);letter-spacing:0.1em;text-transform:uppercase;}
+.ai-text{font-size:12px;color:var(--text-muted);line-height:1.85;}
+.ai-loading{text-align:center;padding:20px;}
+.ai-loading-dots{display:flex;gap:6px;justify-content:center;margin-bottom:10px;}
+.ai-dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);animation:blink 1.2s infinite;}
+.ai-dot:nth-child(2){animation-delay:.2s;}
+.ai-dot:nth-child(3){animation-delay:.4s;}
+@keyframes blink{0%,100%{opacity:0.2;}50%{opacity:1;}}
+
+/* ── HISTORY ── */
+.history-week{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:8px;}
+.history-week-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;cursor:pointer;}
+.history-week-title{font-size:11px;font-weight:500;color:var(--text-muted);font-family:var(--font-m);}
+.history-week-badge{font-size:10px;color:var(--cyan);font-family:var(--font-m);}
+.history-week-body{display:none;padding:10px 14px;border-top:1px solid var(--border);}
+.history-week-body.open{display:block;}
+.history-diag-item{margin-bottom:10px;}
+.history-diag-item:last-child{margin-bottom:0;}
+.history-diag-q{font-size:10px;color:var(--text-dim);margin-bottom:3px;font-family:var(--font-m);letter-spacing:0.04em;}
+.history-diag-a{font-size:12px;color:var(--text-muted);line-height:1.5;}
+.monthly-compare{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.monthly-cell{background:var(--surface2);border-radius:var(--radius-sm);padding:10px;}
+.monthly-cell-week{font-size:9px;color:var(--text-dim);font-family:var(--font-m);margin-bottom:4px;}
+.monthly-cell-val{font-size:18px;font-weight:500;color:var(--cyan);font-family:var(--font-m);}
+.monthly-cell-lbl{font-size:9px;color:var(--text-dim);margin-top:2px;}
+.monthly-insight{font-size:12px;color:var(--text-muted);line-height:1.7;padding:12px;background:var(--cyan-dim);border-radius:var(--radius-sm);border:1px solid rgba(0,229,176,0.2);}
+.archived-month{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:8px;}
+.archived-month-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;cursor:pointer;}
+.archived-month-title{font-size:12px;font-weight:500;color:var(--text-muted);}
+.archived-month-badge{font-size:10px;color:var(--cyan);font-family:var(--font-m);}
+.archived-month-body{display:none;padding:14px;border-top:1px solid var(--border);}
+.archived-month-body.open{display:block;}
+
+/* ── BACKUP ── */
+.backup-row{display:flex;align-items:center;gap:12px;padding:14px;border-bottom:1px solid var(--border);}
+.backup-row:last-child{border-bottom:none;}
+.backup-info{flex:1;}
+.backup-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px;}
+.backup-desc{font-size:11px;color:var(--text-muted);line-height:1.4;}
+.backup-msg{margin-top:10px;padding:10px 14px;border-radius:var(--radius-sm);font-size:12px;display:none;}
+.backup-msg.ok{background:var(--cyan-dim);color:var(--cyan);border:1px solid rgba(0,229,176,0.3);}
+.backup-msg.err{background:var(--orange-dim);color:var(--orange);border:1px solid rgba(255,107,53,0.3);}
+
+/* ── SHARE ── */
+#share-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;display:none;align-items:center;justify-content:center;padding:1.5rem;backdrop-filter:blur(6px);}
+#share-overlay.visible{display:flex;}
+.share-modal{width:100%;max-width:360px;}
+.share-card{background:#0a0a0a;border:1px solid rgba(0,229,176,0.3);border-radius:16px;padding:22px;margin-bottom:14px;position:relative;overflow:hidden;}
+.share-card::before{content:'';position:absolute;top:-60px;right:-60px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(0,229,176,0.12) 0%,transparent 70%);}
+.share-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.share-card-name{font-size:11px;font-weight:700;letter-spacing:0.08em;color:var(--text);}
+.share-card-name span{color:var(--cyan);}
+.share-big-num{font-family:var(--font-m);font-size:52px;font-weight:500;color:var(--cyan);line-height:1;margin-bottom:3px;}
+.share-big-label{font-size:11px;color:var(--text-muted);letter-spacing:0.06em;margin-bottom:18px;}
+.share-metrics{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:18px;}
+.share-metric{background:rgba(255,255,255,0.04);border-radius:8px;padding:9px 6px;text-align:center;}
+.share-metric-val{font-family:var(--font-m);font-size:15px;color:var(--text);font-weight:500;}
+.share-metric-lbl{font-size:9px;color:var(--text-dim);margin-top:2px;letter-spacing:0.04em;}
+.share-streak-bar{display:flex;gap:3px;margin-bottom:18px;}
+.share-streak-dot{flex:1;height:4px;border-radius:2px;background:var(--surface2);}
+.share-streak-dot.filled{background:var(--cyan);}
+.share-streak-dot.today{background:var(--cyan);box-shadow:0 0 6px var(--cyan);}
+.share-tads{margin-bottom:14px;}
+.share-tad{display:flex;align-items:flex-start;gap:7px;margin-bottom:5px;}
+.share-tad-dot{width:5px;height:5px;border-radius:50%;background:var(--cyan);flex-shrink:0;margin-top:4px;}
+.share-tad-dot.empty{background:var(--text-dim);opacity:0.4;}
+.share-tad-text{font-size:11px;color:var(--text-muted);line-height:1.4;}
+.share-tad-text.done-text{color:var(--cyan);}
+.share-footer{display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid var(--border);}
+.share-footer-left{font-family:var(--font-m);font-size:9px;color:var(--text-dim);}
+.share-footer-right{font-size:9px;color:rgba(0,229,176,0.5);}
+.share-actions{display:flex;gap:8px;}
+
+/* ── MISC ── */
+.select-row{display:flex;align-items:center;justify-content:space-between;padding:13px 14px;}
+.select-label{font-size:13px;color:var(--text-muted);}
+select{background:var(--surface2);border:1px solid var(--cyan);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font-d);font-size:12px;padding:5px 10px;cursor:pointer;}
+.no-screen{background:var(--orange-dim);border:1px solid rgba(255,107,53,0.3);border-radius:var(--radius);padding:12px 14px;margin-top:10px;}
+.no-screen-title{font-size:12px;font-weight:500;color:var(--orange);margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+.no-screen-desc{font-size:11px;color:rgba(255,107,53,0.65);line-height:1.5;}
+.about-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-top:10px;}
+.about-brand{display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.about-logo{width:40px;height:40px;border-radius:50%;overflow:hidden;border:1.5px solid rgba(0,229,176,0.3);flex-shrink:0;}
+.about-logo img{width:100%;height:100%;object-fit:cover;}
+.about-text{font-size:12px;color:var(--text-muted);line-height:1.7;}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="splash-logo"><img id="splash-img" src="" alt="NS" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>
+  <div class="splash-name">NEURO<span>SYSTEM</span></div>
+  <div class="splash-sub">Radiografía Mental</div>
+  <div class="splash-bar"><div class="splash-bar-fill"></div></div>
+</div>
+
+<!-- ONBOARDING -->
+<div id="onboarding">
+  <!-- Step 0 -->
+  <div class="ob-step" id="ob-0">
+    <div class="ob-logo">
+      <div class="ob-logo-img"><img id="ob-logo-img" src="" alt="NS"></div>
+      <div class="ob-channel">Radiografía Mental</div>
+      <div class="ob-brand">NEURO<span>SYSTEM</span></div>
+    </div>
+    <div class="ob-dots"><div class="ob-dot active"></div><div class="ob-dot"></div><div class="ob-dot"></div><div class="ob-dot"></div></div>
+    <div class="ob-title">Bienvenido al sistema de<br><span>alto rendimiento</span></div>
+    <div class="ob-desc">En 60 segundos configuramos tu NEUROSYSTEM para que funcione exactamente para tu biología.</div>
+    <div class="ob-sci"><div class="ob-sci-lbl">⚡ Base científica</div><div class="ob-sci-txt">Tu cerebro opera en ciclos ultradianos de 90 minutos. Configurar el sistema según tu cronotipo maximiza la eficiencia del córtex prefrontal.</div></div>
+    <button class="ob-btn" onclick="obGo(1)">Comenzar configuración →</button>
+    <div class="ob-skip" onclick="skipOB()">Ya conozco el sistema, saltar</div>
+  </div>
+  <!-- Step 1: Cronotipo -->
+  <div class="ob-step" id="ob-1" style="display:none">
+    <div class="ob-dots"><div class="ob-dot done"></div><div class="ob-dot active"></div><div class="ob-dot"></div><div class="ob-dot"></div></div>
+    <div class="ob-title">¿Cuál es tu <span>cronotipo</span>?</div>
+    <div class="ob-desc">Define en qué ventana tu córtex prefrontal opera con máxima eficiencia. Cap. 1 · NEUROSYSTEM</div>
+    <div class="ob-opts">
+      <div class="ob-opt" id="co-mat" onclick="selChrono('mat')"><div class="ob-opt-icon">🌅</div><div><div class="ob-opt-title">Matutino — Pico temprano</div><div class="ob-opt-desc">Tu mejor foco: 5–10 AM</div></div></div>
+      <div class="ob-opt" id="co-int" onclick="selChrono('int')"><div class="ob-opt-icon">☀️</div><div><div class="ob-opt-title">Intermedio — Pico gradual</div><div class="ob-opt-desc">Tu mejor foco: 9 AM–1 PM</div></div></div>
+      <div class="ob-opt" id="co-noc" onclick="selChrono('noc')"><div class="ob-opt-icon">🌙</div><div><div class="ob-opt-title">Nocturno — Pico tardío</div><div class="ob-opt-desc">Tu mejor foco: 5–10 PM</div></div></div>
+    </div>
+    <button class="ob-btn" id="ob-btn1" onclick="obGo(2)" style="opacity:.4;pointer-events:none">Continuar →</button>
+  </div>
+  <!-- Step 2: TADs -->
+  <div class="ob-step" id="ob-2" style="display:none">
+    <div class="ob-dots"><div class="ob-dot done"></div><div class="ob-dot done"></div><div class="ob-dot active"></div><div class="ob-dot"></div></div>
+    <div class="ob-title">Define tus <span>TADs</span> de hoy</div>
+    <div class="ob-desc">Al menos la primera. Escríbelas antes de abrir cualquier otra app. Cap. 2 · NEUROSYSTEM</div>
+    <div class="ob-sci"><div class="ob-sci-lbl">🧠 Efecto Zeigarnik</div><div class="ob-sci-txt">Escribir las tareas en un sistema externo libera la tensión cognitiva de fondo. Mejor foco, menos ruido mental.</div></div>
+    <div class="ob-tads">
+      <div class="ob-tad-row"><span class="ob-tad-num">01</span><input class="ob-tad-inp" id="ob-t0" placeholder="Tarea crítica de hoy..."></div>
+      <div class="ob-tad-row"><span class="ob-tad-num">02</span><input class="ob-tad-inp" id="ob-t1" placeholder="Segunda prioridad..."></div>
+      <div class="ob-tad-row"><span class="ob-tad-num">03</span><input class="ob-tad-inp" id="ob-t2" placeholder="Tercera prioridad..."></div>
+    </div>
+    <button class="ob-btn" onclick="obSaveTads()">Guardar y continuar →</button>
+    <div class="ob-skip" onclick="obGo(3)">Definir después</div>
+  </div>
+  <!-- Step 3: Listo -->
+  <div class="ob-step" id="ob-3" style="display:none;text-align:center">
+    <div class="ob-dots"><div class="ob-dot done"></div><div class="ob-dot done"></div><div class="ob-dot done"></div><div class="ob-dot active"></div></div>
+    <div style="font-size:48px;margin-bottom:16px">✦</div>
+    <div style="font-size:22px;font-weight:700;color:var(--cyan);margin-bottom:8px">Sistema activado</div>
+    <div id="ob-chrono-badge" class="ob-chrono-badge">Cronotipo: Intermedio ☀️</div>
+    <div style="font-size:13px;color:var(--text-muted);line-height:1.7;margin-bottom:2rem">Tu NEUROSYSTEM está listo.<br>Primer paso: activa el bloque de 90 min cuando empiece tu pico.</div>
+    <button class="ob-btn" onclick="finishOB()">✦ Comenzar mi primer bloque</button>
+  </div>
+</div>
+
+<!-- MORNING CHECK -->
+<div id="morning-check">
+  <div class="mc-header">
+    <div class="mc-greeting" id="mc-greeting">Buenos días ✦</div>
+    <div class="mc-date" id="mc-date"></div>
+  </div>
+  <div class="mc-section">
+    <div class="mc-label">TADs de hoy (del Cierre PM de ayer)</div>
+    <div id="mc-tads-prev"></div>
+  </div>
+  <div class="mc-section">
+    <div class="mc-label">¿Cómo está tu energía hoy?</div>
+    <div class="energy-display"><div class="energy-num" id="mc-energy-num">5</div><div class="energy-label" id="mc-energy-lbl">Energía normal</div></div>
+    <input type="range" class="ob-energy-slider" id="mc-energy" min="1" max="10" value="5" oninput="updateEnergy(this.value)">
+    <div class="ob-energy-labels"><span>Agotado</span><span>Normal</span><span>Máximo</span></div>
+  </div>
+  <div id="mc-mant-suggest" style="display:none" class="alert"><div style="font-size:16px;flex-shrink:0">🛠</div><div><strong>Energía baja detectada.</strong> Considera activar el Día de Mantenimiento: 1 TAD hoy. Cap. 2</div></div>
+  <button class="ob-btn" onclick="finishMorning()" style="margin-top:8px">▶ Iniciar mi día</button>
+</div>
+
+<!-- APP PRINCIPAL -->
+<div class="header">
+  <div class="header-top">
+    <div class="brand">
+      <div class="brand-logo"><img id="header-logo" src="" alt="RM"></div>
+      <div class="brand-text">
+        <span class="brand-ch">Radiografía Mental</span>
+        <span class="brand-name">NEURO<span>SYSTEM</span></span>
+      </div>
+    </div>
+    <div class="date-pill" id="date-label"></div>
+  </div>
+  <!-- Daily Status Widget -->
+  <div class="daily-widget" id="daily-widget"></div>
+</div>
+
+<nav class="nav">
+  <button class="nav-btn active" onclick="showTab('foco',this)">FOCO</button>
+  <button class="nav-btn" onclick="showTab('valle',this)">VALLE</button>
+  <button class="nav-btn" onclick="showTab('cierre',this)">CIERRE PM</button>
+  <button class="nav-btn" onclick="showTab('semana',this)">PROGRESO</button>
+  <button class="nav-btn" onclick="showTab('datos',this)">DATOS</button>
+</nav>
+
+<div class="content">
+
+<!-- FOCO -->
+<div id="tab-foco" class="tab active">
+  <div id="alert-two-days" class="alert" style="display:none"><div style="font-size:16px;flex-shrink:0">⚠</div><div><strong>Un día no destruye el circuito.</strong> El compromiso es hoy. — Regla de los Dos Días · Cap. 3</div></div>
+  <div id="alert-hard-week" class="alert" style="display:none"><div style="font-size:16px;flex-shrink:0">🔴</div><div><strong>Semana difícil detectada.</strong> 2+ días consecutivos en 0%. Modo simplificado activado: una sola TAD hoy. Cap. 2</div></div>
+  <div id="banner-focus-lock" class="alert" style="display:none;background:rgba(0,229,176,0.08);border-color:var(--cyan)"><div style="font-size:16px;flex-shrink:0">🔒</div><div style="color:var(--cyan)"><strong>Bloque de foco activo.</strong> TADs bloqueadas. Pausa el temporizador para editarlas.</div></div>
+  <div id="banner-install" class="banner-cyan" style="display:none"><div style="font-size:20px">📲</div><div class="banner-cyan-text"><strong>Instala como app</strong>Agrega a pantalla de inicio para proteger tus datos.</div><button class="btn sm primary" onclick="installPWA()">Instalar</button></div>
+  <div id="banner-backup" class="alert" style="display:none"><div style="font-size:16px;flex-shrink:0">💾</div><div><strong>Haz tu backup semanal.</strong> Han pasado 7+ días sin exportar datos. Ve a DATOS → Exportar. <span style="text-decoration:underline;cursor:pointer" onclick="dismissBackup()">Recordar después</span></div></div>
+
+  <div class="sl">Tareas de Alto Desempeño — Cap. 2</div>
+  <div class="card">
+    <div id="tad-list"></div>
+    <div class="progress-area">
+      <div class="progress-track"><div class="progress-fill" id="prog"></div></div>
+      <div class="progress-meta"><span>tasa de ejecución</span><strong id="pct-val">0%</strong></div>
+    </div>
+    <div class="tad-footer">
+      <span class="chrono-badge" id="chrono-display">— Configurar cronotipo</span>
+      <button class="add-tad-btn" id="add-tad-btn" onclick="addTad()">+ Agregar TAD</button>
+    </div>
+  </div>
+  <div style="text-align:right;margin-top:8px"><span style="font-size:11px;color:var(--text-dim);cursor:pointer" id="mant-toggle" onclick="toggleMant()">🛠 Día de Mantenimiento</span></div>
+
+  <div class="sl">Bloque de Foco — 90 min · Cap. 1</div>
+  <div class="card">
+    <div class="timer-display">
+      <div class="timer-num" id="timer-num">90:00</div>
+      <div class="timer-status" id="timer-status">Tu mente no necesita más motivación. Necesita menos fricción.</div>
+    </div>
+    <div class="timer-start-time" id="timer-start-time"></div>
+    <div class="timer-btns">
+      <button class="btn primary" id="btn-start" onclick="timerAction('start')">▶ Iniciar</button>
+      <button class="btn" id="btn-pause" onclick="timerAction('pause')" style="display:none">⏸ Pausar</button>
+      <button class="btn ghost" onclick="timerAction('reset')">↺ Reset</button>
+    </div>
+  </div>
+  <div id="share-trigger-wrap"></div>
+</div>
+
+<!-- VALLE -->
+<div id="tab-valle" class="tab">
+  <div class="sl">Protocolo de Recuperación Válido — Cap. 1</div>
+  <div class="card">
+    <div class="proto-item"><div class="proto-icon">🚶</div><div><div class="proto-title">Movimiento</div><div class="proto-desc">Camina 5 minutos sin pantalla. Activa los ganglios basales y elimina residuos metabólicos del córtex.</div><div class="proto-ref">NEUROSYSTEM · Radiografía Mental</div></div></div>
+    <div class="proto-item"><div class="proto-icon">💧</div><div><div class="proto-title">Hidratación</div><div class="proto-desc">Un vaso de agua. Una disminución del 2% en hidratación reduce la atención ejecutiva de forma medible.</div><div class="proto-ref">NEUROSYSTEM · Radiografía Mental</div></div></div>
+    <div class="proto-item"><div class="proto-icon">🌬</div><div><div class="proto-title">Box Breathing</div><div class="proto-desc">Inhala 4 s → Retén 4 s → Exhala 4 s → Retén 4 s. Activa el sistema parasimpático en 3–5 min.</div><div class="proto-ref">NEUROSYSTEM · Radiografía Mental</div></div></div>
+    <div class="proto-item"><div class="proto-icon">🏔</div><div><div class="proto-title">Vista al horizonte</div><div class="proto-desc">5 minutos mirando un punto lejano. Desactiva el estado de atención focal intensa.</div><div class="proto-ref">NEUROSYSTEM · Radiografía Mental</div></div></div>
+  </div>
+  <div class="no-screen"><div class="no-screen-title">📵 Prohibido el uso de pantallas</div><div class="no-screen-desc">Cap. 1 — Instagram, TikTok, WhatsApp. Dopamina impredecible que bloquea la restauración de acetilcolina. Un valle falso no recupera el sistema nervioso.</div></div>
+  <div class="sl" style="margin-top:1.25rem">Registro del Valle</div>
+  <div class="card"><div class="select-row"><span class="select-label">¿Fue un valle real o falso?</span><select id="valle-sel" onchange="saveValle()"><option value="">— Seleccionar —</option><option value="real">Valle real 🌳</option><option value="falso">Valle falso 📱</option></select></div></div>
+  <div class="sl">Temporizador de Valle — 15 min</div>
+  <div class="card">
+    <div class="timer-display"><div class="timer-num" id="v-timer-num">15:00</div><div class="timer-status" id="v-timer-status">Listo para iniciar</div></div>
+    <div class="timer-btns">
+      <button class="btn primary" id="vbtn-start" onclick="vTA('start')">▶ Iniciar</button>
+      <button class="btn" id="vbtn-pause" onclick="vTA('pause')" style="display:none">⏸ Pausar</button>
+      <button class="btn ghost" onclick="vTA('reset')">↺ Reset</button>
+    </div>
+  </div>
+</div>
+
+<!-- CIERRE PM -->
+<div id="tab-cierre" class="tab">
+  <div class="sl">Rutina de Cierre PM — Cap. 2</div>
+  <div class="card">
+    <div class="cierre-step">
+      <div class="step-circle" id="s1">1</div>
+      <div style="flex:1"><div class="step-title">Revisión de TADs completadas</div><div class="step-desc">Marca las tareas hechas. Libera el Efecto Zeigarnik y cierra los loops cognitivos del día.</div><button class="btn sm" onclick="doneStep(1)">✓ Listo</button></div>
+    </div>
+    <div class="cierre-step">
+      <div class="step-circle" id="s2">2</div>
+      <div style="flex:1"><div class="step-title">TADs de mañana</div><div class="step-desc">Define las tareas del día siguiente. Cap. 2 — protocolo de planificación nocturna.</div>
+      <input class="ci-inp" id="m0" placeholder="TAD 1 de mañana">
+      <input class="ci-inp" id="m1" placeholder="TAD 2 de mañana">
+      <input class="ci-inp" id="m2" placeholder="TAD 3 de mañana">
+      <button class="btn sm" style="margin-top:4px" onclick="doneStep(2)">✓ Guardar</button></div>
+    </div>
+    <div class="cierre-step">
+      <div class="step-circle" id="s3">3</div>
+      <div style="flex:1"><div class="step-title">Checklist de preparación</div><div class="step-desc">Elimina decisiones de la mañana. Cap. 2 — reducción de fricción matutina.</div>
+      <label class="check-label"><input type="checkbox"> Ropa seleccionada para mañana</label>
+      <label class="check-label"><input type="checkbox"> Espacio de trabajo ordenado</label>
+      <label class="check-label"><input type="checkbox"> Teléfono en modo no molestar</label>
+      <label class="check-label"><input type="checkbox"> Hora de dormir definida</label>
+      <button class="btn primary full" style="margin-top:10px" onclick="closeDia()">🌙 Cerrar el día</button></div>
+    </div>
+  </div>
+  <div id="day-done" style="display:none" class="day-closed"><div class="day-closed-icon">✦</div><div class="day-closed-title">Día cerrado correctamente</div><div class="day-closed-sub">Protocolo NEUROSYSTEM · Radiografía Mental</div></div>
+</div>
+
+<!-- PROGRESO -->
+<div id="tab-semana" class="tab">
+  <div class="sl">Meta-análisis · Cap. 4</div>
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-val" id="s-avg">—</div><div class="stat-lbl">promedio TAD</div></div>
+    <div class="stat-card"><div class="stat-val" id="s-streak">—</div><div class="stat-lbl">racha actual</div></div>
+    <div class="stat-card"><div class="stat-val" id="s-valles">—</div><div class="stat-lbl">valles reales</div></div>
+  </div>
+  <!-- Calendar -->
+  <div class="card">
+    <div class="cal-wrap">
+      <div class="cal-legend">
+        <span class="cal-legend-title">Consistencia · 90 días</span>
+        <div class="cal-legend-dots">
+          <span style="font-size:9px;color:var(--text-dim)">menos</span>
+          <div class="cal-legend-dot" style="background:var(--surface2);border:1px solid var(--border)"></div>
+          <div class="cal-legend-dot" style="background:rgba(0,229,176,0.22)"></div>
+          <div class="cal-legend-dot" style="background:rgba(0,229,176,0.55)"></div>
+          <div class="cal-legend-dot" style="background:var(--cyan)"></div>
+          <span style="font-size:9px;color:var(--text-dim)">más</span>
+        </div>
+      </div>
+      <div class="cal-day-labels"><div class="cal-day-label">L</div><div class="cal-day-label">M</div><div class="cal-day-label">X</div><div class="cal-day-label">J</div><div class="cal-day-label">V</div><div class="cal-day-label">S</div><div class="cal-day-label">D</div></div>
+      <div id="cal-grid"></div>
+    </div>
+  </div>
+  <!-- AI Coach -->
+  <div class="sl" style="margin-top:1.25rem">Coach IA — Diagnóstico semanal · Cap. 4</div>
+  <div class="card" style="padding:14px">
+    <div id="ai-loading" style="display:none" class="ai-loading"><div class="ai-loading-dots"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div><div style="font-size:12px;color:var(--cyan);font-family:var(--font-m)">Analizando tu semana...</div></div>
+    <div id="ai-coach-box" style="display:none" class="ai-box"><div class="ai-header"><div class="ai-avatar">🧠</div><span class="ai-label">Análisis NEUROSYSTEM · IA</span></div><div id="ai-coach-text" class="ai-text"></div></div>
+    <button class="btn primary full" id="ai-btn" onclick="runAI()" style="margin-bottom:14px">🧠 Generar diagnóstico con IA</button>
+    <div style="border-top:1px solid var(--border);padding-top:14px">
+      <div style="font-family:var(--font-m);font-size:10px;color:var(--text-dim);letter-spacing:0.1em;margin-bottom:10px">NOTAS MANUALES (OPCIONAL)</div>
+      <div class="diag-q"><label class="diag-label">1 · Consistencia</label><textarea id="diag-1" rows="2" placeholder="¿Cuántos días completé las TADs?"></textarea></div>
+      <div class="diag-q"><label class="diag-label">2 · Patrón de días malos</label><textarea id="diag-2" rows="2" placeholder="¿Qué detonó las fallas?"></textarea></div>
+      <div class="diag-q"><label class="diag-label">3 · Calibración de TADs</label><textarea id="diag-3" rows="2" placeholder="¿Tamaño correcto?"></textarea></div>
+      <div class="diag-q" style="margin-bottom:10px"><label class="diag-label">4 · Valle real vs. falso</label><textarea id="diag-4" rows="2" placeholder="¿Cuántos valles fueron reales?"></textarea></div>
+      <button class="btn full ghost" onclick="saveDiag()">💾 Guardar notas</button>
+      <div id="diag-saved-msg" style="display:none;margin-top:8px;font-size:11px;color:var(--cyan);text-align:center">✓ Guardado</div>
+    </div>
+  </div>
+  <div class="sl" style="margin-top:1.25rem">Historial de semanas</div>
+  <div id="diag-history-list"></div>
+  <div id="monthly-summary-section" style="display:none">
+    <div class="sl" style="margin-top:1.25rem">🗓 Cierre mensual — 4 semanas</div>
+    <div class="card" style="padding:14px" id="monthly-summary-card"></div>
+    <button class="btn primary full" style="margin-top:10px" onclick="closeMes()">✦ Cerrar mes e iniciar nuevo ciclo</button>
+  </div>
+  <div id="archived-months-section" style="display:none">
+    <div class="sl" style="margin-top:1.25rem">📁 Meses cerrados</div>
+    <div id="archived-months-list"></div>
+  </div>
+</div>
+
+<!-- DATOS -->
+<div id="tab-datos" class="tab">
+  <div class="sl">Tu perfil</div>
+  <div class="card">
+    <div class="select-row"><span class="select-label">Cronotipo</span>
+      <select id="chrono-sel" onchange="saveChrono()">
+        <option value="">— Seleccionar —</option>
+        <option value="mat">🌅 Matutino (5–10 AM)</option>
+        <option value="int">☀️ Intermedio (9 AM–1 PM)</option>
+        <option value="noc">🌙 Nocturno (5–10 PM)</option>
+      </select>
+    </div>
+    <div class="select-row" style="border-top:1px solid var(--border)"><span class="select-label">TADs por defecto</span>
+      <select id="tad-count-sel" onchange="saveTadCount()">
+        <option value="1">1 TAD</option>
+        <option value="2">2 TADs</option>
+        <option value="3" selected>3 TADs</option>
+        <option value="4">4 TADs</option>
+        <option value="5">5 TADs</option>
+      </select>
+    </div>
+  </div>
+  <div class="sl" style="margin-top:1.4rem">Copia de seguridad</div>
+  <div class="card">
+    <div class="backup-row"><div class="backup-info"><div class="backup-title">Exportar datos</div><div class="backup-desc">Descarga tu historial. Guárdalo en Google Drive o iCloud. Hazlo cada semana.</div></div><button class="btn sm primary" onclick="exportData()">↓ Exportar</button></div>
+    <div class="backup-row"><div class="backup-info"><div class="backup-title">Importar datos</div><div class="backup-desc">Restaura desde un archivo .nsbackup anterior.</div></div><button class="btn sm" onclick="document.getElementById('import-file').click()">↑ Importar</button><input type="file" id="import-file" accept=".nsbackup" style="display:none" onchange="importData(event)"></div>
+  </div>
+  <div id="backup-msg" class="backup-msg"></div>
+  <div class="sl" style="margin-top:1.4rem">Acerca de</div>
+  <div class="about-card">
+    <div class="about-brand">
+      <div class="about-logo"><img id="about-logo" src="" alt="RM"></div>
+      <div><div style="font-size:10px;font-family:var(--font-m);color:var(--cyan);letter-spacing:0.1em">Radiografía Mental</div><div style="font-size:14px;font-weight:500;color:var(--text)">NEUROSYSTEM v3.0</div></div>
+    </div>
+    <div class="about-text">Aplicativo oficial del libro <strong>NEUROSYSTEM</strong>. Desarrollado exclusivamente para lectores del canal Radiografía Mental.<br><br>Sin servidores externos. Sin cuentas. Tus datos solo en tu dispositivo.</div>
+  </div>
+  <div style="margin-top:10px;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)">
+    <div style="font-size:12px;color:var(--text-dim);line-height:1.8">
+      <div>Versión: <span style="color:var(--text-muted)">3.0.0</span></div>
+      <div>Almacenamiento: <span style="color:var(--cyan)" id="data-size">—</span></div>
+      <div>Días registrados: <span style="color:var(--text-muted)" id="data-days">—</span></div>
+      <div>Último backup: <span style="color:var(--text-muted)" id="last-backup-info">Nunca</span></div>
+    </div>
+    <button class="btn orange full sm" style="margin-top:12px;width:100%" onclick="confirmReset()">⚠ Borrar todos los datos</button>
+  </div>
+</div>
+</div>
+
+<!-- SHARE OVERLAY -->
+<div id="share-overlay">
+  <div class="share-modal">
+    <div class="share-card">
+      <div class="share-card-header">
+        <div><div class="share-card-name">NEURO<span>SYSTEM</span></div><div style="font-size:9px;color:var(--text-dim);font-family:var(--font-m)">Radiografía Mental</div></div>
+        <div style="font-family:var(--font-m);font-size:10px;color:var(--text-dim)" id="sc-date"></div>
+      </div>
+      <div class="share-streak-bar" id="sc-streak-bar"></div>
+      <div class="share-big-num" id="sc-pct">0%</div>
+      <div class="share-big-label" id="sc-pct-label">TASA DE EJECUCIÓN</div>
+      <div class="share-metrics">
+        <div class="share-metric"><div class="share-metric-val" id="sc-focus">—</div><div class="share-metric-lbl">MIN FOCO</div></div>
+        <div class="share-metric"><div class="share-metric-val" id="sc-streak-num">—</div><div class="share-metric-lbl">RACHA</div></div>
+        <div class="share-metric"><div class="share-metric-val" id="sc-valle">—</div><div class="share-metric-lbl">VALLE</div></div>
+      </div>
+      <div class="share-tads" id="sc-tads"></div>
+      <div class="share-footer"><div class="share-footer-left">neurosystem.radiografiamental.com</div><div class="share-footer-right">DÍA <span id="sc-day-num">1</span> ✦</div></div>
+    </div>
+    <div class="share-actions">
+      <button class="btn primary" onclick="downloadCard()">📸 Guardar imagen</button>
+      <button class="btn ghost" onclick="closeShare()">✕ Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// CONSTANTS & STATE
+// ══════════════════════════════════════════
+var DAYS=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+var MONTHS=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+var today=new Date(), todayStr=today.toDateString(), SK='ns_v3';
+
+var LOGO='data:image/png;base64,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';
+
+// Set all logos
+['splash-img','ob-logo-img','header-logo','about-logo'].forEach(function(id){var el=document.getElementById(id);if(el)el.src=LOGO;});
+
+var st={
+  tads:[],         // [{text,done}]
+  tadCount:3,
+  weekData:[],
+  valleType:'',
+  cierreSteps:[false,false,false],
+  mañanaTads:['','',''],
+  onboardingDone:false,
+  cronotipo:'',
+  mantMode:false,
+  focusMin:0,
+  energyToday:5,
+  lastBackup:null,
+  backupDismissed:null,
+  diagnosticos:{},
+  mesesCerrados:[]
+};
+
+function loadSt(){
+  try{
+    var raw=localStorage.getItem(SK); if(!raw)return;
+    var s=JSON.parse(raw);
+    // Always load persistent
+    ['onboardingDone','cronotipo','weekData','diagnosticos','mesesCerrados','tadCount','lastBackup'].forEach(function(k){if(s[k]!==undefined)st[k]=s[k];});
+    if(s.date===todayStr){
+      ['tads','valleType','cierreSteps','mañanaTads','mantMode','focusMin','energyToday','backupDismissed'].forEach(function(k){if(s[k]!==undefined)st[k]=s[k];});
+    } else {
+      // New day — load tomorrow's tads as today's
+      if(s.mañanaTads&&s.mañanaTads.some(function(t){return t;})){
+        var count=st.tadCount||3;
+        st.tads=[];
+        for(var i=0;i<count;i++) st.tads.push({text:s.mañanaTads[i]||'',done:false});
+      } else {
+        initTads();
+      }
+      // Check for hard week (2+ consecutive 0%)
+      checkHardWeek();
+    }
+    if(!st.tads||!st.tads.length) initTads();
+  }catch(e){initTads();}
+}
+
+function initTads(){
+  st.tads=[];
+  for(var i=0;i<(st.tadCount||3);i++) st.tads.push({text:'',done:false});
+}
+
+function save(){
+  try{
+    var s=Object.assign({},st,{date:todayStr});
+    localStorage.setItem(SK,JSON.stringify(s));
+    updateDataInfo();
+  }catch(e){}
+}
+
+loadSt();
+
+// ══════════════════════════════════════════
+// SPLASH
+// ══════════════════════════════════════════
+setTimeout(function(){
+  document.getElementById('splash').classList.add('hide');
+  setTimeout(function(){
+    document.getElementById('splash').style.display='none';
+    if(!st.onboardingDone){showOB();}
+    else{checkMorning();}
+  },500);
+},1600);
+
+// ══════════════════════════════════════════
+// ONBOARDING
+// ══════════════════════════════════════════
+var obChrono='';
+function showOB(){document.getElementById('onboarding').style.display='flex';}
+function hideOB(){var o=document.getElementById('onboarding');o.style.opacity='0';o.style.transition='opacity .3s';setTimeout(function(){o.style.display='none';},300);}
+function obGo(n){
+  for(var i=0;i<=3;i++){var e=document.getElementById('ob-'+i);if(e)e.style.display='none';}
+  var nx=document.getElementById('ob-'+n);
+  if(nx){nx.style.display='block';nx.style.animation='slideIn .3s ease';}
+}
+function selChrono(t){
+  obChrono=t;
+  ['mat','int','noc'].forEach(function(x){document.getElementById('co-'+x).classList.remove('sel');});
+  document.getElementById('co-'+t).classList.add('sel');
+  var b=document.getElementById('ob-btn1');b.style.opacity='1';b.style.pointerEvents='auto';
+}
+function obSaveTads(){
+  var count=st.tadCount||3;
+  st.tads=[];
+  for(var i=0;i<count;i++){
+    var v=document.getElementById('ob-t'+i)?document.getElementById('ob-t'+i).value:'';
+    st.tads.push({text:v,done:false});
+  }
+  var labels={mat:'Matutino 🌅',int:'Intermedio ☀️',noc:'Nocturno 🌙'};
+  document.getElementById('ob-chrono-badge').textContent='Cronotipo: '+(labels[obChrono]||'Intermedio ☀️');
+  obGo(3);
+}
+function finishOB(){
+  if(obChrono)st.cronotipo=obChrono;
+  st.onboardingDone=true;
+  save(); updateChronoDisplay(); hideOB(); initApp();
+}
+function skipOB(){st.onboardingDone=true;save();hideOB();initApp();}
+
+// ══════════════════════════════════════════
+// MORNING CHECK
+// ══════════════════════════════════════════
+function checkMorning(){
+  var lastOpen=localStorage.getItem(SK+'_lastopen');
+  var needsMorning=!lastOpen||new Date(lastOpen).toDateString()!==todayStr;
+  localStorage.setItem(SK+'_lastopen',today.toISOString());
+  if(needsMorning&&st.onboardingDone){showMorning();}
+  else{initApp();}
+}
+function showMorning(){
+  var mc=document.getElementById('morning-check');
+  mc.style.display='flex';
+  mc.style.flexDirection='column';
+  // Greeting
+  var h=today.getHours();
+  var g=h<12?'Buenos días':'Buenas tardes';
+  document.getElementById('mc-greeting').textContent=g+' ✦';
+  document.getElementById('mc-date').textContent=DAYS[today.getDay()]+', '+today.getDate()+' de '+MONTHS[today.getMonth()];
+  // Previous TADs
+  var prev=document.getElementById('mc-tads-prev');
+  prev.innerHTML='';
+  var hasTads=st.tads&&st.tads.some(function(t){return t.text;});
+  if(hasTads){
+    st.tads.forEach(function(t){
+      if(!t.text)return;
+      var d=document.createElement('div');
+      d.className='mc-tad-prev';
+      d.innerHTML='<span style="font-size:14px;flex-shrink:0">📌</span><span class="mc-tad-text">'+escHtml(t.text)+'</span>';
+      prev.appendChild(d);
+    });
+  } else {
+    prev.innerHTML='<div style="font-size:12px;color:var(--text-dim);padding:10px 0">No hay TADs definidas. Ve a FOCO para escribirlas.</div>';
+  }
+  updateEnergy(5);
+}
+function updateEnergy(v){
+  v=parseInt(v);
+  document.getElementById('mc-energy-num').textContent=v;
+  var labels=['','Agotado 😴','Muy bajo 😓','Bajo 😔','Algo cansado 😐','Normal 🙂','Bien 😊','Buena energía 💪','Alta energía ⚡','Muy alta ⚡⚡','Máximo 🚀'];
+  document.getElementById('mc-energy-lbl').textContent=labels[v]||'';
+  document.getElementById('mc-mant-suggest').style.display=v<=3?'flex':'none';
+}
+function finishMorning(){
+  var ev=parseInt(document.getElementById('mc-energy').value);
+  st.energyToday=ev;
+  if(ev<=3) st.mantMode=true;
+  save();
+  document.getElementById('morning-check').style.display='none';
+  initApp();
+}
+
+// ══════════════════════════════════════════
+// INIT APP
+// ══════════════════════════════════════════
+function initApp(){
+  renderDateLabel();
+  renderTads();
+  updateChronoDisplay();
+  updateDailyWidget();
+  checkAlerts();
+  checkBackupReminder();
+  restoreTimer();
+  if(document.getElementById('chrono-sel'))document.getElementById('chrono-sel').value=st.cronotipo||'';
+  if(document.getElementById('tad-count-sel'))document.getElementById('tad-count-sel').value=st.tadCount||3;
+}
+
+function renderDateLabel(){
+  document.getElementById('date-label').textContent=DAYS[today.getDay()]+', '+today.getDate()+' '+MONTHS[today.getMonth()];
+}
+
+// ══════════════════════════════════════════
+// DAILY STATUS WIDGET
+// ══════════════════════════════════════════
+function updateDailyWidget(){
+  var w=document.getElementById('daily-widget');
+  if(!w)return;
+  var done=st.tads.filter(function(t){return t.done;}).length;
+  var total=st.tads.length||1;
+  var pct=Math.round(done/total*100);
+  var timerDone=st.focusMin>0;
+  var valleDone=!!st.valleType;
+  var cierreDone=st.cierreSteps&&st.cierreSteps[2];
+  var items=[
+    {label:'TADs',val:done+'/'+total,done:pct===100},
+    {label:'Foco',val:timerDone?(st.focusMin+'min'):'—',done:timerDone},
+    {label:'Valle',val:valleDone?(st.valleType==='real'?'🌳 Real':'📱 Falso'):'—',done:valleDone&&st.valleType==='real'},
+    {label:'Cierre PM',val:cierreDone?'✓':'—',done:cierreDone}
+  ];
+  w.innerHTML=items.map(function(it){
+    return '<div class="dw-item'+(it.done?' done':'')+'"><div class="dw-dot'+(it.done?' done':'')+'"></div><span class="dw-label">'+it.label+'</span><span class="dw-val">'+it.val+'</span></div>';
+  }).join('');
+}
+
+// ══════════════════════════════════════════
+// TADS — CONFIGURABLE
+// ══════════════════════════════════════════
+function renderTads(){
+  var list=document.getElementById('tad-list');
+  if(!list)return;
+  list.innerHTML='';
+  st.tads.forEach(function(t,i){
+    var row=document.createElement('div');
+    row.className='tad-row';
+    row.id='tr-'+i;
+    row.innerHTML=
+      '<span class="tad-num">0'+(i+1)+'</span>'+
+      '<div class="tad-check'+(t.done?' done':'')+'" id="ck-'+i+'" onclick="toggleTad('+i+')"></div>'+
+      '<input class="tad-inp'+(t.done?' done':'')+'" id="ti-'+i+'" value="'+escHtml(t.text)+'" placeholder="TAD '+(i+1)+'...">'+
+      (st.tads.length>1?'<button class="tad-del" onclick="removeTad('+i+')">×</button>':'');
+    list.appendChild(row);
+    // Input listener
+    (function(idx){
+      document.getElementById('ti-'+idx).addEventListener('input',function(){
+        st.tads[idx].text=this.value;
+        save();
+      });
+    })(i);
+  });
+  // Add btn visibility
+  var addBtn=document.getElementById('add-tad-btn');
+  if(addBtn)addBtn.style.display=st.tads.length>=5?'none':'block';
+  updateProgress();
+}
+
+function toggleTad(i){
+  st.tads[i].done=!st.tads[i].done;
+  renderTads();
+  save();
+  updateDailyWidget();
+  if(navigator.vibrate)navigator.vibrate(40);
+  checkShareTrigger();
+}
+
+function addTad(){
+  if(st.tads.length>=5)return;
+  st.tads.push({text:'',done:false});
+  save();renderTads();
+}
+
+function removeTad(i){
+  if(st.tads.length<=1)return;
+  st.tads.splice(i,1);
+  save();renderTads();
+}
+
+function saveTadCount(){
+  var sel=document.getElementById('tad-count-sel');
+  st.tadCount=parseInt(sel.value)||3;
+  save();
+}
+
+function updateProgress(){
+  var done=st.tads.filter(function(t){return t.done;}).length;
+  var total=st.tads.length||1;
+  var pct=Math.round(done/total*100);
+  var prog=document.getElementById('prog');
+  var pctVal=document.getElementById('pct-val');
+  if(prog)prog.style.width=pct+'%';
+  if(pctVal)pctVal.textContent=pct+'%';
+  updateTimerStatus(pct);
+}
+
+function checkShareTrigger(){
+  var done=st.tads.filter(function(t){return t.done;}).length;
+  var pct=Math.round(done/st.tads.length*100);
+  var wrap=document.getElementById('share-trigger-wrap');
+  if(!wrap)return;
+  if(pct===100){
+    wrap.innerHTML='<button class="btn primary full" style="margin-top:10px" onclick="openShare()">✦ Compartir mi resultado de hoy</button>';
+  } else {
+    wrap.innerHTML='';
+  }
+}
+
+// ══════════════════════════════════════════
+// MODO MANTENIMIENTO
+// ══════════════════════════════════════════
+function toggleMant(){
+  st.mantMode=!st.mantMode;
+  if(st.mantMode){
+    // Reduce to 1 TAD
+    while(st.tads.length>1)st.tads.pop();
+    document.getElementById('mant-toggle').style.color='var(--orange)';
+    document.getElementById('mant-toggle').textContent='🛠 Modo Mantenimiento activo — Toca para desactivar';
+  } else {
+    while(st.tads.length<(st.tadCount||3))st.tads.push({text:'',done:false});
+    document.getElementById('mant-toggle').style.color='';
+    document.getElementById('mant-toggle').textContent='🛠 Día de Mantenimiento';
+  }
+  save();renderTads();
+}
+
+function checkHardWeek(){
+  var wd=st.weekData||[];
+  var consecutive=0;
+  for(var i=wd.length-1;i>=0;i--){
+    if(wd[i].pct===0)consecutive++;
+    else break;
+    if(consecutive>=2){st.mantMode=true;break;}
+  }
+}
+
+// ══════════════════════════════════════════
+// CRONOTIPO
+// ══════════════════════════════════════════
+function updateChronoDisplay(){
+  var el=document.getElementById('chrono-display');
+  var sel=document.getElementById('chrono-sel');
+  var labels={mat:'Pico 5–10 AM 🌅',int:'Pico 9 AM–1 PM ☀️',noc:'Pico 5–10 PM 🌙'};
+  if(st.cronotipo&&el)el.textContent=labels[st.cronotipo];
+  if(sel&&st.cronotipo)sel.value=st.cronotipo;
+}
+function saveChrono(){
+  st.cronotipo=document.getElementById('chrono-sel').value;
+  save();updateChronoDisplay();
+}
+
+// ══════════════════════════════════════════
+// ALERTS
+// ══════════════════════════════════════════
+function checkAlerts(){
+  var wd=st.weekData||[];
+  var yest=new Date(today);yest.setDate(today.getDate()-1);
+  var yEntry=wd.find(function(e){return e.date===yest.toDateString();});
+  document.getElementById('alert-two-days').style.display=(yEntry&&yEntry.pct===0)?'flex':'none';
+  // Hard week
+  var consec=0;
+  for(var i=wd.length-1;i>=0;i--){if(wd[i].pct===0)consec++;else break;}
+  document.getElementById('alert-hard-week').style.display=consec>=2?'flex':'none';
+}
+
+function checkBackupReminder(){
+  var last=st.lastBackup?new Date(st.lastBackup):null;
+  var dismissed=st.backupDismissed?new Date(st.backupDismissed):null;
+  var now=today;
+  var show=false;
+  if(!last)show=st.weekData&&st.weekData.length>=7;
+  else show=(now-last)>7*24*3600*1000;
+  if(dismissed&&(now-dismissed)<24*3600*1000)show=false;
+  document.getElementById('banner-backup').style.display=show?'flex':'none';
+}
+function dismissBackup(){st.backupDismissed=today.toISOString();save();document.getElementById('banner-backup').style.display='none';}
+
+// ══════════════════════════════════════════
+// TIMER — PERSISTE AO FECHAR
+// ══════════════════════════════════════════
+var timerSecs=90*60,timerRunning=false,timerInterval=null,timerStartTs=null;
+
+function restoreTimer(){
+  var saved=localStorage.getItem(SK+'_timer');
+  if(!saved)return;
+  try{
+    var d=JSON.parse(saved);
+    if(!d.running||!d.startTs)return;
+    var elapsed=Math.floor((Date.now()-d.startTs)/1000);
+    var rem=d.totalSecs-elapsed;
+    if(rem<=0){clearTimerStorage();return;}
+    timerSecs=rem;
+    timerStartTs=d.startTs;
+    timerRunning=true;
+    document.getElementById('timer-num').classList.add('running');
+    document.getElementById('btn-start').style.display='none';
+    document.getElementById('btn-pause').style.display='flex';
+    showTimerStartTime(d.startTs);
+    timerInterval=setInterval(timerTick,1000);
+    lockFocus(true);
+  }catch(e){}
+}
+function saveTimerStorage(){
+  if(timerRunning&&timerStartTs){
+    localStorage.setItem(SK+'_timer',JSON.stringify({running:true,startTs:timerStartTs,totalSecs:90*60}));
+  }
+}
+function clearTimerStorage(){localStorage.removeItem(SK+'_timer');}
+
+function showTimerStartTime(ts){
+  var d=new Date(ts);
+  var h=d.getHours(),m=d.getMinutes();
+  var el=document.getElementById('timer-start-time');
+  if(el)el.textContent='Iniciado a las '+(h<10?'0'+h:h)+':'+(m<10?'0'+m:m);
+}
+
+function timerTick(){
+  if(timerSecs<=0){
+    clearInterval(timerInterval);timerRunning=false;clearTimerStorage();
+    lockFocus(false);
+    var elapsed=90;
+    st.focusMin=(st.focusMin||0)+elapsed;save();
+    setTimerStatus('Bloque completado. Activa el Valle ahora. ✦','var(--cyan)');
+    document.getElementById('btn-start').style.display='flex';
+    document.getElementById('btn-pause').style.display='none';
+    document.getElementById('timer-num').classList.remove('running');
+    document.getElementById('timer-start-time').textContent='';
+    if(navigator.vibrate)navigator.vibrate([100,50,100]);
+    updateDailyWidget();
+    return;
+  }
+  timerSecs--;
+  var m=Math.floor(timerSecs/60),s=timerSecs%60;
+  document.getElementById('timer-num').textContent=(m<10?'0'+m:m)+':'+(s<10?'0'+s:s);
+  var elapsed=Math.floor((90*60-timerSecs)/60);
+  setTimerStatus('En curso — '+elapsed+' min completados','var(--text-dim)');
+}
+
+function timerAction(a){
+  if(a==='start'){
+    if(timerRunning)return;
+    timerRunning=true;
+    timerStartTs=Date.now();
+    lockFocus(true);
+    document.getElementById('btn-start').style.display='none';
+    document.getElementById('btn-pause').style.display='flex';
+    document.getElementById('timer-num').classList.add('running');
+    showTimerStartTime(timerStartTs);
+    timerInterval=setInterval(timerTick,1000);
+    saveTimerStorage();
+  } else if(a==='pause'){
+    clearInterval(timerInterval);timerRunning=false;clearTimerStorage();
+    var elapsed=Math.floor((90*60-timerSecs)/60);
+    st.focusMin=(st.focusMin||0)+elapsed;save();
+    lockFocus(false);
+    document.getElementById('btn-start').style.display='flex';
+    document.getElementById('btn-pause').style.display='none';
+    document.getElementById('timer-num').classList.remove('running');
+    document.getElementById('timer-start-time').textContent='';
+    setTimerStatus('En pausa. El foco vuelve cuando tú decides.','var(--text-dim)');
+    updateDailyWidget();
+  } else {
+    clearInterval(timerInterval);timerRunning=false;timerSecs=90*60;timerStartTs=null;clearTimerStorage();
+    lockFocus(false);
+    document.getElementById('timer-num').textContent='90:00';
+    document.getElementById('btn-start').style.display='flex';
+    document.getElementById('btn-pause').style.display='none';
+    document.getElementById('timer-num').classList.remove('running');
+    document.getElementById('timer-start-time').textContent='';
+    updateProgress();
+  }
+}
+
+window.addEventListener('beforeunload',saveTimerStorage);
+window.addEventListener('pagehide',saveTimerStorage);
+
+function setTimerStatus(txt,color){
+  var el=document.getElementById('timer-status');
+  if(el){el.textContent=txt;el.style.color=color;}
+}
+function updateTimerStatus(pct){
+  if(timerRunning)return;
+  if(pct===100)setTimerStatus('Sistema calibrado. Córtex en máxima eficiencia. ✦','var(--cyan)');
+  else if(pct>=66)setTimerStatus('Buen ritmo. Una TAD más y el día está ganado.','var(--text-muted)');
+  else if(pct>0)setTimerStatus('El foco profundo cambia todo. Activa el temporizador.','var(--text-dim)');
+  else setTimerStatus('Tu mente no necesita más motivación. Necesita menos fricción.','var(--text-muted)');
+}
+
+function lockFocus(lock){
+  document.querySelectorAll('.tad-inp').forEach(function(e){e.readOnly=lock;e.style.opacity=lock?'0.75':'1';});
+  document.querySelectorAll('.tad-check').forEach(function(e){e.style.pointerEvents=lock?'none':'';e.style.opacity=lock?'0.75':'1';});
+  document.querySelectorAll('.nav-btn').forEach(function(e,i){if(i>0){e.style.pointerEvents=lock?'none':'';e.style.opacity=lock?'0.35':'1';}});
+  document.getElementById('banner-focus-lock').style.display=lock?'flex':'none';
+}
+
+// ══════════════════════════════════════════
+// VALLE TIMER
+// ══════════════════════════════════════════
+var vSecs=15*60,vRunning=false,vInterval=null;
+function vTick(){
+  if(vSecs<=0){clearInterval(vInterval);vRunning=false;
+    document.getElementById('v-timer-status').textContent='Valle completado 🌳';
+    document.getElementById('vbtn-start').style.display='flex';document.getElementById('vbtn-pause').style.display='none';
+    document.getElementById('v-timer-num').classList.remove('running');
+    if(navigator.vibrate)navigator.vibrate([100,50,100]);return;
+  }
+  vSecs--;var m=Math.floor(vSecs/60),s=vSecs%60;
+  document.getElementById('v-timer-num').textContent=(m<10?'0'+m:m)+':'+(s<10?'0'+s:s);
+  document.getElementById('v-timer-status').textContent='Recuperando sistema nervioso...';
+}
+function vTA(a){
+  if(a==='start'){if(vRunning)return;vRunning=true;document.getElementById('vbtn-start').style.display='none';document.getElementById('vbtn-pause').style.display='flex';document.getElementById('v-timer-num').classList.add('running');vInterval=setInterval(vTick,1000);}
+  else if(a==='pause'){clearInterval(vInterval);vRunning=false;document.getElementById('vbtn-start').style.display='flex';document.getElementById('vbtn-pause').style.display='none';document.getElementById('v-timer-status').textContent='Pausado';document.getElementById('v-timer-num').classList.remove('running');}
+  else{clearInterval(vInterval);vRunning=false;vSecs=15*60;document.getElementById('v-timer-num').textContent='15:00';document.getElementById('v-timer-status').textContent='Listo para iniciar';document.getElementById('vbtn-start').style.display='flex';document.getElementById('vbtn-pause').style.display='none';document.getElementById('v-timer-num').classList.remove('running');}
+}
+
+// ══════════════════════════════════════════
+// VALLE
+// ══════════════════════════════════════════
+function saveValle(){st.valleType=document.getElementById('valle-sel').value;save();updateDailyWidget();}
+if(st.valleType)document.getElementById('valle-sel').value=st.valleType;
+
+// ══════════════════════════════════════════
+// CIERRE PM
+// ══════════════════════════════════════════
+function doneStep(n){
+  st.cierreSteps[n-1]=true;
+  var el=document.getElementById('s'+n);el.classList.add('done');el.textContent='✓';save();
+}
+for(var _i=0;_i<3;_i++){if(st.cierreSteps[_i]){var _e=document.getElementById('s'+(_i+1));if(_e){_e.classList.add('done');_e.textContent='✓';}}}
+if(st.mañanaTads){for(var _i=0;_i<3;_i++){var _m=document.getElementById('m'+_i);if(_m&&st.mañanaTads[_i])_m.value=st.mañanaTads[_i];}}
+
+function closeDia(){
+  var done=st.tads.filter(function(t){return t.done;}).length;
+  var pct=Math.round(done/st.tads.length*100);
+  var entry={date:todayStr,day:today.getDay(),pct:pct,valleReal:st.valleType==='real',focusMin:st.focusMin||0};
+  var wd=st.weekData||[];
+  var idx=wd.findIndex(function(e){return e.date===todayStr;});
+  if(idx>-1)wd[idx]=entry;else wd.push(entry);
+  if(wd.length>90)wd.shift();
+  st.weekData=wd;
+  st.mañanaTads=[document.getElementById('m0').value,document.getElementById('m1').value,document.getElementById('m2').value];
+  st.cierreSteps[2]=true;
+  var s3=document.getElementById('s3');s3.classList.add('done');s3.textContent='✓';
+  document.getElementById('day-done').style.display='block';
+  save();updateDailyWidget();
+}
+
+// ══════════════════════════════════════════
+// CALENDAR GRID
+// ══════════════════════════════════════════
+function renderCalendar(){
+  var wd=st.weekData||[];
+  var grid=document.getElementById('cal-grid');
+  if(!grid)return;grid.innerHTML='';
+  var days=[];
+  for(var i=89;i>=0;i--){var d=new Date(today);d.setDate(today.getDate()-i);var e=wd.find(function(x){return x.date===d.toDateString();})||null;days.push({date:d,entry:e});}
+  var firstDow=(days[0].date.getDay()||7)-1; // 0=Mon
+  for(var i=0;i<firstDow;i++)days.unshift(null);
+  var weeks=[];for(var i=0;i<days.length;i+=7)weeks.push(days.slice(i,i+7));
+  var monthsSeen={};
+  weeks.forEach(function(wk){
+    var row=document.createElement('div');row.className='cal-row';
+    var lbl=document.createElement('div');lbl.className='cal-row-label';
+    var first=wk.find(function(d){return d&&d.date;});
+    if(first){var mo=first.date.getMonth();if(!monthsSeen[mo]){monthsSeen[mo]=1;lbl.textContent=MONTHS[mo].substr(0,3);}}
+    row.appendChild(lbl);
+    wk.forEach(function(cell){
+      var dot=document.createElement('div');dot.className='cal-cell';
+      if(!cell){dot.style.background='transparent';}
+      else{
+        var isTd=cell.date.toDateString()===todayStr;
+        var pct=cell.entry?cell.entry.pct:null;
+        var bg,border='';
+        if(isTd&&pct===null){bg='transparent';border='1.5px solid var(--cyan)';}
+        else if(pct===null){bg='var(--surface2)';}
+        else if(pct===0){bg='rgba(255,107,53,0.2)';}
+        else if(pct<=33){bg='rgba(0,229,176,0.22)';}
+        else if(pct<=66){bg='rgba(0,229,176,0.50)';}
+        else if(pct<100){bg='rgba(0,229,176,0.75)';}
+        else{bg='var(--cyan)';}
+        dot.style.background=bg;
+        if(border)dot.style.border=border;
+        if(isTd)dot.style.boxShadow='0 0 0 1.5px var(--cyan)';
+        var tip=DAYS[cell.date.getDay()]+' '+cell.date.getDate()+' '+MONTHS[cell.date.getMonth()];
+        if(pct!==null)tip+=' · '+pct+'%';
+        dot.title=tip;
+      }
+      row.appendChild(dot);
+    });
+    grid.appendChild(row);
+  });
+}
+
+function renderWeek(){
+  renderCalendar();
+  var wd=st.weekData||[];
+  var withData=wd.filter(function(e){return typeof e.pct==='number';});
+  var avg=withData.length?Math.round(withData.reduce(function(a,b){return a+b.pct;},0)/withData.length):null;
+  var streak=0;for(var i=wd.length-1;i>=0;i--){if(wd[i].pct>0)streak++;else break;}
+  var valles=wd.filter(function(e){return e.valleReal;}).length;
+  document.getElementById('s-avg').textContent=avg!==null?avg+'%':'—';
+  document.getElementById('s-streak').textContent=withData.length?streak:'—';
+  document.getElementById('s-valles').textContent=withData.length?valles:'—';
+  // Load saved AI analysis if exists
+  var wk=getWeekKey();
+  var diag=st.diagnosticos&&st.diagnosticos[wk];
+  if(diag&&diag.aiAnalysis){
+    document.getElementById('ai-coach-text').textContent=diag.aiAnalysis;
+    document.getElementById('ai-coach-box').style.display='block';
+    document.getElementById('ai-btn').textContent='🔄 Regenerar diagnóstico';
+  }
+  loadDiag();renderDiagHistory();renderArchivedMonths();
+}
+
+// ══════════════════════════════════════════
+// AI COACH
+// ══════════════════════════════════════════
+async function runAI(){
+  var wd=st.weekData||[];
+  var weekE=[];
+  for(var i=6;i>=0;i--){
+    var d=new Date(today);d.setDate(today.getDate()-i);
+    var e=wd.find(function(x){return x.date===d.toDateString();});
+    if(e)weekE.push({day:DAYS[d.getDay()],pct:e.pct,valleReal:e.valleReal,focusMin:e.focusMin||0});
+  }
+  if(!weekE.length){alert('Aún no hay datos esta semana. Completa al menos 1 Cierre PM para generar el diagnóstico.');return;}
+  var avgPct=Math.round(weekE.reduce(function(a,b){return a+b.pct;},0)/weekE.length);
+  var diasActivos=weekE.filter(function(e){return e.pct>0;}).length;
+  var vallesReales=weekE.filter(function(e){return e.valleReal;}).length;
+  var diasCero=weekE.filter(function(e){return e.pct===0;}).map(function(e){return e.day;});
+  var totalFocus=weekE.reduce(function(a,b){return a+(b.focusMin||0);},0);
+  var cronoLbl={mat:'matutino (pico 5-10 AM)',int:'intermedio (pico 9 AM-1 PM)',noc:'nocturno (pico 5-10 PM)'};
+  var prompt='Eres el coach del método NEUROSYSTEM de Radiografía Mental.\n\nDatos semana:\n- Promedio TAD: '+avgPct+'%\n- Días activos: '+diasActivos+'/'+weekE.length+'\n- Días 0%: '+(diasCero.join(', ')||'ninguno')+'\n- Valles reales: '+vallesReales+'/'+weekE.length+'\n- Minutos foco: '+totalFocus+'\n- Cronotipo: '+(cronoLbl[st.cronotipo]||'no definido')+'\n\nDetalle:\n'+weekE.map(function(e){return'- '+e.day+': '+e.pct+'% | Valle '+(e.valleReal?'real':'falso')+' | '+e.focusMin+'min';}).join('\n')+'\n\nGenera diagnóstico semanal en español mexicano. Directo, científico, accionable. Estructura: 1) diagnóstico general (máx 20 palabras) 2) patrón detectado 3) estado de recuperación 4) UNA recomendación de ajuste. Usa términos del libro: TADs, ciclos ultradianos, valle real/falso, Efecto Zeigarnik. Máx 130 palabras. Sin markdown.';
+  document.getElementById('ai-loading').style.display='block';
+  document.getElementById('ai-coach-box').style.display='none';
+  document.getElementById('ai-btn').style.display='none';
+  try{
+    var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:1000,system:'Eres el coach NEUROSYSTEM. Respondes en español de México. Directo y científico. Sin markdown.',messages:[{role:'user',content:prompt}]})});
+    var data=await res.json();
+    var txt=data.content&&data.content[0]?data.content[0].text:'No se pudo generar. Intenta de nuevo.';
+    document.getElementById('ai-coach-text').textContent=txt;
+    document.getElementById('ai-coach-box').style.display='block';
+    var wk=getWeekKey();
+    if(!st.diagnosticos)st.diagnosticos={};
+    if(!st.diagnosticos[wk])st.diagnosticos[wk]={};
+    st.diagnosticos[wk].aiAnalysis=txt;
+    st.diagnosticos[wk].savedAt=today.toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'});
+    st.diagnosticos[wk].avgPct=avgPct;st.diagnosticos[wk].diasActivos=diasActivos;st.diagnosticos[wk].vallesReales=vallesReales;
+    save();renderDiagHistory();
+  }catch(e){
+    document.getElementById('ai-coach-text').textContent='Error de conexión. Verifica tu internet e intenta de nuevo.';
+    document.getElementById('ai-coach-box').style.display='block';
+  }finally{
+    document.getElementById('ai-loading').style.display='none';
+    document.getElementById('ai-btn').style.display='flex';
+    document.getElementById('ai-btn').textContent='🔄 Regenerar diagnóstico';
+  }
+}
+
+// ══════════════════════════════════════════
+// DIAGNOSTICO MANUAL
+// ══════════════════════════════════════════
+function getWeekKey(){
+  var d=new Date(today);d.setHours(0,0,0,0);d.setDate(d.getDate()+4-(d.getDay()||7));
+  var ys=new Date(d.getFullYear(),0,1);var wn=Math.ceil((((d-ys)/86400000)+1)/7);
+  return d.getFullYear()+'-W'+(wn<10?'0'+wn:wn);
+}
+function loadDiag(){
+  var wk=getWeekKey();var d=(st.diagnosticos||{})[wk]||{};
+  ['1','2','3','4'].forEach(function(n){var e=document.getElementById('diag-'+n);if(e)e.value=d['d'+n]||'';});
+}
+function saveDiag(){
+  var wk=getWeekKey();
+  if(!st.diagnosticos)st.diagnosticos={};
+  if(!st.diagnosticos[wk])st.diagnosticos[wk]={};
+  ['1','2','3','4'].forEach(function(n){var e=document.getElementById('diag-'+n);if(e)st.diagnosticos[wk]['d'+n]=e.value;});
+  st.diagnosticos[wk].savedAt=today.toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'});
+  save();
+  var m=document.getElementById('diag-saved-msg');m.style.display='block';setTimeout(function(){m.style.display='none';},2500);
+  renderDiagHistory();
+}
+
+// ══════════════════════════════════════════
+// HISTORY
+// ══════════════════════════════════════════
+function renderDiagHistory(){
+  var diagData=st.diagnosticos||{};var keys=Object.keys(diagData).sort().reverse();
+  var c=document.getElementById('diag-history-list');if(!c)return;
+  c.innerHTML='';
+  if(!keys.length){c.innerHTML='<div style="font-size:12px;color:var(--text-dim);text-align:center;padding:12px">Aún no hay diagnósticos guardados.</div>';return;}
+  keys.forEach(function(k,i){
+    var d=diagData[k];var card=document.createElement('div');card.className='history-week';
+    var trend='';if(i<keys.length-1){var p=diagData[keys[i+1]];trend=d.avgPct>p.avgPct?' ↑':d.avgPct<p.avgPct?' ↓':' →';}
+    var aiHtml=d.aiAnalysis?'<div class="ai-box" style="margin-top:10px"><div class="ai-header"><div class="ai-avatar">🧠</div><span class="ai-label">Análisis IA</span></div><div class="ai-text">'+escHtml(d.aiAnalysis)+'</div></div>':'';
+    card.innerHTML='<div class="history-week-header" onclick="this.nextElementSibling.classList.toggle(\'open\')"><span class="history-week-title">'+(d.savedAt||k)+'</span><span class="history-week-badge">'+(d.avgPct||0)+'%'+trend+'</span></div><div class="history-week-body">'+aiHtml+'<div class="history-diag-item"><div class="history-diag-q">CONSISTENCIA</div><div class="history-diag-a">'+(d.d1||'—')+'</div></div><div class="history-diag-item"><div class="history-diag-q">PATRÓN</div><div class="history-diag-a">'+(d.d2||'—')+'</div></div><div class="history-diag-item"><div class="history-diag-q">CALIBRACIÓN</div><div class="history-diag-a">'+(d.d3||'—')+'</div></div><div class="history-diag-item"><div class="history-diag-q">VALLES</div><div class="history-diag-a">'+(d.d4||'—')+'</div></div><div style="display:flex;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)"><span style="font-size:10px;color:var(--text-dim);font-family:var(--font-m)">📊 '+(d.avgPct||0)+'%</span><span style="font-size:10px;color:var(--text-dim);font-family:var(--font-m)">⚡ '+(d.diasActivos||0)+' días</span><span style="font-size:10px;color:var(--text-dim);font-family:var(--font-m)">🌳 '+(d.vallesReales||0)+' valles</span></div></div>';
+    c.appendChild(card);
+  });
+  if(keys.length>=4)renderMonthlySummary(diagData,keys);
+}
+function renderMonthlySummary(diagData,keys){
+  var sec=document.getElementById('monthly-summary-section');var card=document.getElementById('monthly-summary-card');
+  if(!sec||!card)return;sec.style.display='block';
+  var last4=keys.slice(0,4).reverse();var weeks=last4.map(function(k){return diagData[k];});
+  var grid='<div class="monthly-compare">';
+  weeks.forEach(function(w,i){var c=w.avgPct>=80?'var(--cyan)':w.avgPct>=50?'var(--text-muted)':'var(--orange)';grid+='<div class="monthly-cell"><div class="monthly-cell-week">SEMANA '+(i+1)+'</div><div class="monthly-cell-val" style="color:'+c+'">'+w.avgPct+'%</div><div class="monthly-cell-lbl">'+(w.diasActivos||0)+' act · '+(w.vallesReales||0)+' 🌳</div></div>';});
+  grid+='</div>';
+  var avgs=weeks.map(function(w){return w.avgPct;});
+  var trend=avgs[3]-avgs[0];
+  var rising=avgs.every(function(v,i){return i===0||v>=avgs[i-1];});
+  var falling=avgs.every(function(v,i){return i===0||v<=avgs[i-1];});
+  var tA=weeks.reduce(function(a,w){return a+(w.diasActivos||0);},0);
+  var tV=weeks.reduce(function(a,w){return a+(w.vallesReales||0);},0);
+  var gAvg=Math.round(avgs.reduce(function(a,b){return a+b;},0)/4);
+  var ins=rising?'📈 <b>Tendencia positiva.</b> Consistencia creciente las 4 semanas.':falling?'📉 <b>Tendencia a revisar.</b> Consistencia bajando. Recalibra tus TADs.':trend>10?'📈 <b>Progreso neto.</b> El mes cerró mejor de lo que empezó.':trend<-10?'⚠️ <b>Caída neta.</b> Identifica qué cambió.':'➡️ <b>Mes estable.</b> Evalúa si las TADs son suficientemente desafiantes.';
+  ins+=' <b>'+tA+' días activos</b> · <b>'+tV+' valles reales</b> · Promedio: <b>'+gAvg+'%</b>.';
+  card.innerHTML=grid+'<div class="monthly-insight">'+ins+'</div>';
+  card.setAttribute('data-avg',gAvg);card.setAttribute('data-insight',ins);card.setAttribute('data-weeks',JSON.stringify(last4));
+}
+function closeMes(){
+  if(!confirm('¿Cerrar este mes y comenzar un nuevo ciclo?'))return;
+  var diagData=st.diagnosticos||{};var keys=Object.keys(diagData).sort().reverse();var last4=keys.slice(0,4);
+  var card=document.getElementById('monthly-summary-card');
+  var ins=card?card.getAttribute('data-insight'):'';var gAvg=card?card.getAttribute('data-avg'):'0';
+  if(!st.mesesCerrados)st.mesesCerrados=[];
+  st.mesesCerrados.unshift({label:today.toLocaleDateString('es-MX',{month:'long',year:'numeric'}),closedAt:today.toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'}),globalAvg:parseInt(gAvg),insight:ins,weeks:last4.map(function(k){return diagData[k];})});
+  last4.forEach(function(k){delete st.diagnosticos[k];});
+  document.getElementById('monthly-summary-section').style.display='none';
+  save();renderDiagHistory();renderArchivedMonths();
+}
+function renderArchivedMonths(){
+  var months=st.mesesCerrados||[];var sec=document.getElementById('archived-months-section');var list=document.getElementById('archived-months-list');
+  if(!sec||!list)return;
+  if(!months.length){sec.style.display='none';return;}sec.style.display='block';list.innerHTML='';
+  months.forEach(function(m){
+    var card=document.createElement('div');card.className='archived-month';
+    var wHtml='';
+    if(m.weeks){wHtml='<div class="monthly-compare" style="margin-bottom:10px">';m.weeks.forEach(function(w,j){if(!w)return;var c=w.avgPct>=80?'var(--cyan)':w.avgPct>=50?'var(--text-muted)':'var(--orange)';wHtml+='<div class="monthly-cell"><div class="monthly-cell-week">SEM '+(j+1)+'</div><div class="monthly-cell-val" style="color:'+c+'">'+w.avgPct+'%</div><div class="monthly-cell-lbl">'+(w.diasActivos||0)+' act · '+(w.vallesReales||0)+' 🌳</div></div>';});wHtml+='</div>';}
+    card.innerHTML='<div class="archived-month-header" onclick="this.nextElementSibling.classList.toggle(\'open\')"><span class="archived-month-title">📁 '+m.label+'</span><span class="archived-month-badge">'+m.globalAvg+'% promedio</span></div><div class="archived-month-body">'+wHtml+'<div class="monthly-insight">'+(m.insight||'')+'</div></div>';
+    list.appendChild(card);
+  });
+}
+
+// ══════════════════════════════════════════
+// SHARE CARD
+// ══════════════════════════════════════════
+function openShare(){
+  var wd=st.weekData||[];
+  var done=st.tads.filter(function(t){return t.done;}).length;
+  var pct=Math.round(done/st.tads.length*100);
+  document.getElementById('sc-date').textContent=DAYS[today.getDay()].toUpperCase()+' '+today.getDate()+' '+MONTHS[today.getMonth()].toUpperCase().substr(0,3);
+  document.getElementById('sc-pct').textContent=pct+'%';
+  document.getElementById('sc-pct').style.color=pct===100?'var(--cyan)':pct>=66?'var(--text)':'var(--orange)';
+  document.getElementById('sc-pct-label').textContent=pct===100?'DÍA GANADO ✦':'TASA DE EJECUCIÓN';
+  document.getElementById('sc-focus').textContent=(st.focusMin||0)>0?st.focusMin+'m':'—';
+  var streak=0;for(var i=wd.length-1;i>=0;i--){if(wd[i].pct>0)streak++;else break;}
+  document.getElementById('sc-streak-num').textContent=streak||'1';
+  document.getElementById('sc-valle').textContent=st.valleType==='real'?'🌳':'📱';
+  var bar=document.getElementById('sc-streak-bar');bar.innerHTML='';
+  for(var i=6;i>=0;i--){var d=new Date(today);d.setDate(today.getDate()-i);var e=wd.find(function(x){return x.date===d.toDateString();})||null;var dot=document.createElement('div');dot.className='share-streak-dot'+(i===0?' today':e&&e.pct>0?' filled':'');bar.appendChild(dot);}
+  var tadsEl=document.getElementById('sc-tads');tadsEl.innerHTML='';
+  st.tads.forEach(function(t){if(!t.text)return;var row=document.createElement('div');row.className='share-tad';row.innerHTML='<div class="share-tad-dot'+(t.done?'':' empty')+'"></div><span class="share-tad-text'+(t.done?' done-text':'')+'">'+escHtml(t.done?'✓ '+t.text:'○ '+t.text)+'</span>';tadsEl.appendChild(row);});
+  document.getElementById('sc-day-num').textContent=wd.length+1;
+  document.getElementById('share-overlay').classList.add('visible');
+}
+function closeShare(){document.getElementById('share-overlay').classList.remove('visible');}
+function downloadCard(){alert('📸 Toma una captura de pantalla del card para compartirlo.\n\niPhone: Botón lateral + Subir volumen\nAndroid: Botón encendido + Bajar volumen');}
+
+// ══════════════════════════════════════════
+// BACKUP
+// ══════════════════════════════════════════
+function exportData(){
+  try{
+    var raw=localStorage.getItem(SK)||'{}';
+    var payload={version:'3.0',exportDate:new Date().toISOString(),product:'NEUROSYSTEM — Radiografía Mental',data:JSON.parse(raw)};
+    var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/octet-stream'});
+    var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;
+    a.download='neurosystem-v3-'+new Date().toISOString().split('T')[0]+'.nsbackup';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+    st.lastBackup=new Date().toISOString();save();
+    showBkMsg('✓ Backup exportado. Guárdalo en Google Drive o iCloud.','ok');
+    document.getElementById('banner-backup').style.display='none';
+    updateDataInfo();
+  }catch(e){showBkMsg('Error al exportar. Intenta de nuevo.','err');}
+}
+function importData(ev){
+  var file=ev.target.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{var p=JSON.parse(e.target.result);if(!p.data)throw new Error();localStorage.setItem(SK,JSON.stringify(p.data));loadSt();initApp();showBkMsg('✓ Datos restaurados correctamente.','ok');}
+    catch(err){showBkMsg('Archivo inválido. Solo .nsbackup de NEUROSYSTEM.','err');}
+  };reader.readAsText(file);ev.target.value='';
+}
+function showBkMsg(txt,type){var el=document.getElementById('backup-msg');el.textContent=txt;el.className='backup-msg '+type;el.style.display='block';setTimeout(function(){el.style.display='none';},4000);}
+function updateDataInfo(){
+  try{
+    var raw=localStorage.getItem(SK)||'';var kb=(new Blob([raw]).size/1024).toFixed(1);
+    var el=document.getElementById('data-size');if(el)el.textContent=kb+' KB';
+    var el2=document.getElementById('data-days');if(el2)el2.textContent=(st.weekData?st.weekData.length:0)+' días';
+    var el3=document.getElementById('last-backup-info');
+    if(el3)el3.textContent=st.lastBackup?new Date(st.lastBackup).toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'}):'Nunca';
+  }catch(e){}
+}
+function confirmReset(){if(confirm('¿Borrar TODOS los datos? Esta acción no se puede deshacer.')){localStorage.removeItem(SK);localStorage.removeItem(SK+'_timer');localStorage.removeItem(SK+'_lastopen');location.reload();}}
+
+// ══════════════════════════════════════════
+// PWA
+// ══════════════════════════════════════════
+var deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;document.getElementById('banner-install').style.display='flex';});
+function installPWA(){if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(function(){deferredPrompt=null;document.getElementById('banner-install').style.display='none';});}}
+
+// ══════════════════════════════════════════
+// TABS
+// ══════════════════════════════════════════
+function showTab(id,btn){
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+  document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('tab-'+id).classList.add('active');
+  if(btn)btn.classList.add('active');
+  if(id==='semana')renderWeek();
+  if(id==='dados'||id==='datos')updateDataInfo();
+}
+
+// ══════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════
+function escHtml(t){return(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}
+</script>
+</body>
+</html>
